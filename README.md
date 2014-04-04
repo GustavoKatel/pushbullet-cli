@@ -3,6 +3,8 @@ Pushbullet CLI interface
 
 Use [Pushbullet](https://www.pushbullet.com/) from the command line. In beta!
 
+*Requires `requests` to be installed.*
+
 You can clone this repo and then add the following to your bashrc (or your zshrc, or whatever):
 
     $ echo 'alias pushbullet="/path/to/pushbullet-cli/pushbullet.py'" >> ~/.bashrc
