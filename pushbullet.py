@@ -26,6 +26,19 @@ def nickname_for(device):
     else:
         return extras[u"model"]
 
+# extract options
+# ===============
+options = dict()
+
+tmp = list()
+for str in argv:
+    if str.startswith("--"):
+        options[str.split("=")[0][2:]] = str.split("=")[1]
+    else:
+        tmp.append(str)
+argv = tmp
+
+
 # get the API key
 # ===============
 
@@ -117,14 +130,14 @@ argument = " ".join(argv[1:])
 
 if is_url(argument):
     data["type"] = "link"
-    data["title"] = "Link"
+    data["title"] = options.get("title") or "Link"
     data["url"] = argument
 elif os.path.isfile(argument):
     data["type"] = "file"
     file = argument
 else:
     data["type"] = "note"
-    data["title"] = "Note"
+    data["title"] = options.get("title") or "Note"
     data["body"] = argument
 
 r = None
