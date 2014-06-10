@@ -26,4 +26,6 @@ Push files:
     $ pushbullet /path/to/burrito_photo.jpg
     $ pushbullet /path/to/burrito_recipe.txt
 
+The first time you run this, you'll be asked for your API key, which will be saved in *~/.pushbulletkey*.
+
 I'm not too experienced with Python, so please feel free to send a pull request!
