@@ -31,11 +31,11 @@ def nickname_for(device):
 options = dict()
 
 tmp = list()
-for str in argv:
-    if str.startswith("--"):
-        options[str.split("=")[0][2:]] = str.split("=")[1]
+for s in argv:
+    if s.startswith("--"):
+        options[s.split("=")[0][2:]] = s.split("=")[1]
     else:
-        tmp.append(str)
+        tmp.append(s)
 argv = tmp
 
 
@@ -90,6 +90,9 @@ if len(devices) < 1:
 
 elif len(devices) == 1:
     push_to = devices[0]
+
+elif options.get('target') in [nickname_for(device) for device in devices]:
+    push_to = devices[[nickname_for(device) for device in devices].index(options.get('target'))]
 
 else:
 
