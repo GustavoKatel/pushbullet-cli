@@ -26,4 +26,12 @@ Push files:
     $ pushbullet /path/to/burrito_photo.jpg
     $ pushbullet /path/to/burrito_recipe.txt
 
+Change title from "Note" or "Link":
+
+    $ pushbullet --title="New title" Title is changed.
+    
+Set target where message to:
+
+    $ pushbullet --target=iphone This message will go to iphone without asking.
+
 I'm not too experienced with Python, so please feel free to send a pull request!
