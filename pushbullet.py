@@ -26,18 +26,16 @@ def nickname_for(device):
     else:
         return extras[u"model"]
 
-# extract options
+# extract options and words
 # ===============
 options = dict()
+words = list()
 
-tmp = list()
-for s in argv:
-    if s.startswith("--"):
+for s in argv[1:]:
+    if s.startswith("--") and "=" in s:
         options[s.split("=")[0][2:]] = s.split("=")[1]
     else:
-        tmp.append(s)
-argv = tmp
-
+        words.append(s)
 
 # get the API key
 # ===============
@@ -51,14 +49,14 @@ if not os.path.isfile(key_path):
     with open(key_path, "w") as api_file:
         api_file.write(api_key)
 
-    if len(argv) < 2:
+    if len(words) < 1:
         exit(0)
 
 else:
 
     api_key = open(key_path, "r").read().strip()
 
-    if len(argv) < 2:
+    if len(words) < 1:
         print "Please provide something to push!"
         exit(1)
 
@@ -77,6 +75,7 @@ elif r.status_code != 200:
     exit(1)
 
 devices = r.json()[u"devices"]
+nicknames = [nickname_for(device) for device in devices]
 
 # pick the device to use
 # ======================
@@ -91,15 +90,15 @@ if len(devices) < 1:
 elif len(devices) == 1:
     push_to = devices[0]
 
-elif options.get('target') in [nickname_for(device) for device in devices]:
-    push_to = devices[[nickname_for(device) for device in devices].index(options.get('target'))]
+elif options.get('target') in nicknames:
+    push_to = devices[nicknames.index(options.get('target'))]
 
 else:
 
     for i in xrange(len(devices)):
 
         device = devices[i]
-        nickname = nickname_for(device)
+        nickname = nicknames[i]
         index = str(i + 1)
 
         print "[" + index + "]",
@@ -129,7 +128,7 @@ data = {
 }
 file = None
 
-argument = " ".join(argv[1:])
+argument = " ".join(words)
 
 if is_url(argument):
     data["type"] = "link"
