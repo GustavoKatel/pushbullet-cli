@@ -9,6 +9,7 @@ PUSH_URL = "https://api.pushbullet.com/api/pushes"
 # utility methods
 # ===============
 
+
 def is_url(string):
     if " " in string:
         return False
@@ -18,6 +19,7 @@ def is_url(string):
         return True
     else:
         return False
+
 
 def nickname_for(device):
     extras = device[u"extras"]
@@ -128,7 +130,7 @@ else:
     data["body"] = argument
 
 r = None
-if file == None:
+if file is None:
     r = requests.post(
         PUSH_URL,
         auth=(api_key, ""),
@@ -139,7 +141,7 @@ else:
         PUSH_URL,
         auth=(api_key, ""),
         data=data,
-        files={ "file": open(file, "rb") }
+        files={"file": open(file, "rb")}
     )
 
 if r.status_code == 200:
