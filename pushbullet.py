@@ -34,8 +34,8 @@ def nickname_for(device):
 key_path = os.path.expanduser("~/.pushbulletkey")
 if not os.path.isfile(key_path):
 
-    print "What's your API key?"
-    print "Find it at <https://www.pushbullet.com/account>."
+    print("What's your API key?")
+    print("Find it at <https://www.pushbullet.com/account>.")
     api_key = raw_input("> ").strip()
     with open(key_path, "w") as api_file:
         api_file.write(api_key)
@@ -48,7 +48,7 @@ else:
     api_key = open(key_path, "r").read().strip()
 
     if len(argv) < 2:
-        print "Please provide something to push!"
+        print("Please provide something to push!")
         exit(1)
 
 # get the list of devices
@@ -57,12 +57,12 @@ else:
 r = requests.get("https://api.pushbullet.com/api/devices", auth=(api_key, ""))
 
 if (r.status_code == 401) or (r.status_code == 403):
-    print "Bad API key. Check " + key_path + "."
+    print("Bad API key. Check " + key_path + ".")
     exit(1)
 
 elif r.status_code != 200:
-    print "Request failed with code " + str(r.status_code) + "."
-    print "Try again?"
+    print("Request failed with code " + str(r.status_code) + ".")
+    print("Try again?")
     exit(1)
 
 devices = r.json()[u"devices"]
@@ -73,8 +73,8 @@ devices = r.json()[u"devices"]
 push_to = None
 
 if len(devices) < 1:
-    print "You don't have any devices!"
-    print "Add one at <https://www.pushbullet.com/>."
+    print("You don't have any devices!")
+    print("Add one at <https://www.pushbullet.com/>.")
     exit(1)
 
 elif len(devices) == 1:
@@ -88,12 +88,12 @@ else:
         nickname = nickname_for(device)
         index = str(i + 1)
 
-        print "[" + index + "]",
+        print("[" + index + "]"),
         if i == 0:
-            print nickname,
-            print "(default)"
+            print(nickname),
+            print("(default)")
         else:
-            print nickname
+            print(nickname)
 
     choice = -1
     while (choice < 0) or (choice > len(devices)):
@@ -108,7 +108,7 @@ else:
 # push!
 # =====
 
-print "Pushing to " + nickname_for(push_to) + "..."
+print("Pushing to " + nickname_for(push_to) + "...")
 
 data = {
     "device_iden": push_to[u"iden"]
@@ -145,7 +145,7 @@ else:
     )
 
 if r.status_code == 200:
-    print "Pushed!"
+    print("Pushed!")
 else:
-    print "Failed with status code " + str(r.status_code) + "."
+    print("Failed with status code " + str(r.status_code) + ".")
     exit(1)
