@@ -22,6 +22,9 @@ def is_url(string):
 
 
 def nickname_for(device):
+    if not device:
+        return "All"
+
     extras = device[u"extras"]
     if u"nickname" in extras:
         return extras[u"nickname"]
@@ -81,7 +84,7 @@ elif len(devices) == 1:
     push_to = devices[0]
 
 else:
-
+    print("[0] All (default)")
     for i in xrange(len(devices)):
 
         device = devices[i]
@@ -89,30 +92,29 @@ else:
         index = str(i + 1)
 
         print("[" + index + "]"),
-        if i == 0:
-            print(nickname),
-            print("(default)")
-        else:
-            print(nickname)
+        print(nickname)
 
-    choice = -1
-    while (choice < 0) or (choice > len(devices)):
+    choice = None
+    while (choice is None) or (choice > len(devices)):
         input = raw_input("Push to which device? ").strip()
-        if input == "":
+        if not input:
             choice = 0
         else:
-            choice = int(input) - 1
+            choice = int(input)
 
-    push_to = devices[choice]
+    if choice != 0:
+        push_to = devices[choice - 1]
 
 # push!
 # =====
 
 print("Pushing to " + nickname_for(push_to) + "...")
 
-data = {
-    "device_iden": push_to[u"iden"]
-}
+data = {}
+
+if push_to:
+    data["device_iden"] = push_to[u"iden"]
+
 file = None
 
 argument = " ".join(argv[1:])
