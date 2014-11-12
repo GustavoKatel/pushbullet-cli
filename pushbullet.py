@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from sys import argv
+import argparse
 import os.path
 import requests
 
@@ -31,6 +31,11 @@ def nickname_for(device):
     else:
         return extras[u"model"]
 
+parser = argparse.ArgumentParser(description='Pushbullet')
+parser.add_argument('msg', metavar='message', nargs='+')
+
+args = parser.parse_args()
+
 # get the API key
 # ===============
 
@@ -43,16 +48,9 @@ if not os.path.isfile(key_path):
     with open(key_path, "w") as api_file:
         api_file.write(api_key)
 
-    if len(argv) < 2:
-        exit(0)
-
 else:
 
     api_key = open(key_path, "r").read().strip()
-
-    if len(argv) < 2:
-        print("Please provide something to push!")
-        exit(1)
 
 # get the list of devices
 # =======================
@@ -117,7 +115,7 @@ if push_to:
 
 file = None
 
-argument = " ".join(argv[1:])
+argument = " ".join(args.msg)
 
 if is_url(argument):
     data["type"] = "link"
