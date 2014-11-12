@@ -34,6 +34,12 @@ def nickname_for(device):
 parser = argparse.ArgumentParser(description='Pushbullet')
 parser.add_argument('msg', metavar='message', nargs='+')
 
+devgroup = parser.add_mutually_exclusive_group(required=True)
+devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
+devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
+                      help='Interactively ask for device to push to')
+devgroup.add_argument('-d', '--device', type=str, default=None, help='Device name to push to')
+
 args = parser.parse_args()
 
 # get the API key
@@ -67,6 +73,7 @@ elif r.status_code != 200:
     exit(1)
 
 devices = r.json()[u"devices"]
+devices_by_names = {d['extras']['model']: d for d in devices}
 
 # pick the device to use
 # ======================
@@ -78,11 +85,7 @@ if len(devices) < 1:
     print("Add one at <https://www.pushbullet.com/>.")
     exit(1)
 
-elif len(devices) == 1:
-    push_to = devices[0]
-
-else:
-    print("[0] All (default)")
+if args.interactive:
     for i in xrange(len(devices)):
 
         device = devices[i]
@@ -92,16 +95,26 @@ else:
         print("[" + index + "]"),
         print(nickname)
 
-    choice = None
-    while (choice is None) or (choice > len(devices)):
+    while True:
         input = raw_input("Push to which device? ").strip()
-        if not input:
-            choice = 0
-        else:
-            choice = int(input)
+        try:
+            choice = int(input) - 1
 
-    if choice != 0:
-        push_to = devices[choice - 1]
+        except (ValueError, IndexError):
+            pass
+        else:
+            if 0 <= choice < len(devices):
+                push_to = devices[choice]
+                break
+
+
+elif args.device:
+    if args.device not in devices_by_names:
+        print("Unknown device %s. Available devices: %s" % (
+            args.device, ', '.join(devices_by_names)))
+        exit(1)
+
+    push_to = devices_by_names[args.device]
 
 # push!
 # =====
