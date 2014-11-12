@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from sys import argv
+import argparse
 import os.path
 import requests
 
@@ -22,11 +22,25 @@ def is_url(string):
 
 
 def nickname_for(device):
+    if not device:
+        return "All"
+
     extras = device[u"extras"]
     if u"nickname" in extras:
         return extras[u"nickname"]
     else:
         return extras[u"model"]
+
+parser = argparse.ArgumentParser(description='Pushbullet')
+parser.add_argument('msg', metavar='message', nargs='+')
+
+devgroup = parser.add_mutually_exclusive_group(required=True)
+devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
+devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
+                      help='Interactively ask for device to push to')
+devgroup.add_argument('-d', '--device', type=str, default=None, help='Device name to push to')
+
+args = parser.parse_args()
 
 # get the API key
 # ===============
@@ -40,16 +54,9 @@ if not os.path.isfile(key_path):
     with open(key_path, "w") as api_file:
         api_file.write(api_key)
 
-    if len(argv) < 2:
-        exit(0)
-
 else:
 
     api_key = open(key_path, "r").read().strip()
-
-    if len(argv) < 2:
-        print("Please provide something to push!")
-        exit(1)
 
 # get the list of devices
 # =======================
@@ -66,6 +73,7 @@ elif r.status_code != 200:
     exit(1)
 
 devices = r.json()[u"devices"]
+devices_by_names = {d['extras']['model']: d for d in devices}
 
 # pick the device to use
 # ======================
@@ -77,11 +85,7 @@ if len(devices) < 1:
     print("Add one at <https://www.pushbullet.com/>.")
     exit(1)
 
-elif len(devices) == 1:
-    push_to = devices[0]
-
-else:
-
+if args.interactive:
     for i in xrange(len(devices)):
 
         device = devices[i]
@@ -89,33 +93,42 @@ else:
         index = str(i + 1)
 
         print("[" + index + "]"),
-        if i == 0:
-            print(nickname),
-            print("(default)")
-        else:
-            print(nickname)
+        print(nickname)
 
-    choice = -1
-    while (choice < 0) or (choice > len(devices)):
+    while True:
         input = raw_input("Push to which device? ").strip()
-        if input == "":
-            choice = 0
-        else:
+        try:
             choice = int(input) - 1
 
-    push_to = devices[choice]
+        except (ValueError, IndexError):
+            pass
+        else:
+            if 0 <= choice < len(devices):
+                push_to = devices[choice]
+                break
+
+
+elif args.device:
+    if args.device not in devices_by_names:
+        print("Unknown device %s. Available devices: %s" % (
+            args.device, ', '.join(devices_by_names)))
+        exit(1)
+
+    push_to = devices_by_names[args.device]
 
 # push!
 # =====
 
 print("Pushing to " + nickname_for(push_to) + "...")
 
-data = {
-    "device_iden": push_to[u"iden"]
-}
+data = {}
+
+if push_to:
+    data["device_iden"] = push_to[u"iden"]
+
 file = None
 
-argument = " ".join(argv[1:])
+argument = " ".join(args.msg)
 
 if is_url(argument):
     data["type"] = "link"

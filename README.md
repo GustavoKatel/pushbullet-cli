@@ -12,19 +12,26 @@ You can clone this repo and then add the following to your bashrc (or your zshrc
 
 Push text:
 
-    $ pushbullet burritos
-    $ pushbullet "I love burritos"
-    $ pushbullet Make sure you remember to eat a burrito
+    $ pushbullet [-a/-d/-i] burritos
+    $ pushbullet [-a/-d/-i] "I love burritos"
+    $ pushbullet [-a/-d/-i] Make sure you remember to eat a burrito
 
 Push links:
 
-    $ pushbullet http://losaltostaqueria.org/
-    $ pushbullet https://www.pushbullet.com/
+    $ pushbullet [-a/-d/-i] http://losaltostaqueria.org/
+    $ pushbullet [-a/-d/-i] https://www.pushbullet.com/
 
 Push files:
 
-    $ pushbullet /path/to/burrito_photo.jpg
-    $ pushbullet /path/to/burrito_recipe.txt
+    $ pushbullet [-a/-d/-i] /path/to/burrito_photo.jpg
+    $ pushbullet [-a/-d/-i] /path/to/burrito_recipe.txt
+
+Devices
+-------
+You should use one of the three flags -a, -d or -i to specify a device.
+* -a will push to all devices.
+* -d [name] will push to a specific device by name.
+* -i will prompt you to choose to which device you want to push.
 
 The first time you run this, you'll be asked for your API key, which will be saved in *~/.pushbulletkey*.
 
