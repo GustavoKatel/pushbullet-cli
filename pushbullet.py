@@ -18,7 +18,7 @@ class PushbulletException(Exception):
 
 def _nickname_for(device):
     if not device:
-        return "All"
+        return "all devices"
 
     extras = device[u"extras"]
     if u"nickname" in extras:
