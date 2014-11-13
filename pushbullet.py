@@ -4,6 +4,7 @@ import argparse
 import os.path
 import requests
 import re
+import sys
 
 PUSH_URL = "https://api.pushbullet.com/api/pushes"
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
@@ -27,7 +28,7 @@ def _nickname_for(device):
 
 def _parse_args():
     parser = argparse.ArgumentParser(description='Pushbullet')
-    parser.add_argument('msg', metavar='message', nargs='+')
+    parser.add_argument('msg', metavar='message', nargs='*')
 
     devgroup = parser.add_mutually_exclusive_group(required=True)
     devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
@@ -140,8 +141,13 @@ def main(args):
                 return 1
             device = devices_by_names[args.device]
 
-    arg = " ".join(args.msg)
-    data_type = _data_type(arg)
+    if not args.msg:
+        arg = sys.stdin.read()
+        data_type = 'text'
+    else:
+        arg = " ".join(args.msg)
+        data_type = _data_type(arg)
+
     _push(api_key, device, arg, data_type)
 
     return 0
