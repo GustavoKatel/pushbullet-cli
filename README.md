@@ -11,6 +11,7 @@ You can clone this repo and then add the following to your bashrc (or your zshrc
     $ source ~/.bashrc
 
 Push stdin:
+
     $ echo "hello" | pushbullet [-a/-d/-i]
 
 Push text:
