@@ -1,27 +1,21 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 import argparse
 import os.path
 import requests
+import re
+import sys
 
 PUSH_URL = "https://api.pushbullet.com/api/pushes"
-
-# utility methods
-# ===============
-
-
-def is_url(string):
-    if " " in string:
-        return False
-    elif string[0:7] == "http://":
-        return True
-    elif string[0:8] == "https://":
-        return True
-    else:
-        return False
+KEY_PATH = os.path.expanduser("~/.pushbulletkey")
+URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
 
 
-def nickname_for(device):
+class PushbulletException(Exception):
+    pass
+
+
+def _nickname_for(device):
     if not device:
         return "All"
 
@@ -31,134 +25,136 @@ def nickname_for(device):
     else:
         return extras[u"model"]
 
-parser = argparse.ArgumentParser(description='Pushbullet')
-parser.add_argument('msg', metavar='message', nargs='+')
 
-devgroup = parser.add_mutually_exclusive_group(required=True)
-devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
-devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
-                      help='Interactively ask for device to push to')
-devgroup.add_argument('-d', '--device', type=str, default=None, help='Device name to push to')
+def _parse_args():
+    parser = argparse.ArgumentParser(description='Pushbullet')
+    parser.add_argument('msg', metavar='message', nargs='*')
 
-args = parser.parse_args()
+    devgroup = parser.add_mutually_exclusive_group(required=True)
+    devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
+    devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
+                          help='Interactively ask for device to push to')
+    devgroup.add_argument('-d', '--device', type=str, default=None, help='Device name to push to')
 
-# get the API key
-# ===============
+    return parser.parse_args()
 
-key_path = os.path.expanduser("~/.pushbulletkey")
-if not os.path.isfile(key_path):
 
-    print("What's your API key?")
-    print("Find it at <https://www.pushbullet.com/account>.")
-    api_key = raw_input("> ").strip()
-    with open(key_path, "w") as api_file:
-        api_file.write(api_key)
+def _get_api_key():
+    if not os.path.isfile(KEY_PATH):
+        print("What's your API key?")
+        print("Find it at <https://www.pushbullet.com/account>.")
+        api_key = raw_input("> ").strip()
+        with open(KEY_PATH, "w") as api_file:
+            api_file.write(api_key)
 
-else:
+        return api_key
+    else:
+        with open(KEY_PATH, "r") as api_file:
+            return api_file.read()
 
-    api_key = open(key_path, "r").read().strip()
 
-# get the list of devices
-# =======================
+def _get_devices(api_key):
+    r = requests.get("https://api.pushbullet.com/api/devices", auth=(api_key, ""))
+    if (r.status_code == 401) or (r.status_code == 403):
+        raise PushbulletException("Bad API key. Check %s." % (KEY_PATH, ))
+    elif r.status_code != 200:
+        raise PushbulletException("Request failed with code %d." % (r.status_code, ))
 
-r = requests.get("https://api.pushbullet.com/api/devices", auth=(api_key, ""))
+    return  r.json()[u"devices"]
 
-if (r.status_code == 401) or (r.status_code == 403):
-    print("Bad API key. Check " + key_path + ".")
-    exit(1)
 
-elif r.status_code != 200:
-    print("Request failed with code " + str(r.status_code) + ".")
-    print("Try again?")
-    exit(1)
-
-devices = r.json()[u"devices"]
-devices_by_names = {d['extras']['model']: d for d in devices}
-
-# pick the device to use
-# ======================
-
-push_to = None
-
-if len(devices) < 1:
-    print("You don't have any devices!")
-    print("Add one at <https://www.pushbullet.com/>.")
-    exit(1)
-
-if args.interactive:
-    for i in xrange(len(devices)):
-
-        device = devices[i]
-        nickname = nickname_for(device)
-        index = str(i + 1)
-
-        print("[" + index + "]"),
-        print(nickname)
+def _prompt_device(devices):
+    for i, device in enumerate(devices):
+        nickname = _nickname_for(device)
+        print ("[%d] %s" % (i, nickname))
 
     while True:
         input = raw_input("Push to which device? ").strip()
         try:
-            choice = int(input) - 1
-
+            choice = int(input)
         except (ValueError, IndexError):
             pass
         else:
             if 0 <= choice < len(devices):
-                push_to = devices[choice]
-                break
+                return devices[choice]
 
 
-elif args.device:
-    if args.device not in devices_by_names:
-        print("Unknown device %s. Available devices: %s" % (
-            args.device, ', '.join(devices_by_names)))
+def _push(api_key, device, raw_data, data_type):
+    data = {}
+
+    if device:
+        data["device_iden"] = device[u"iden"]
+
+    kwargs = {
+        'auth': (api_key, ""),
+        'data': data
+    }
+
+    if data_type == 'url':
+        data["type"] = "link"
+        data["title"] = "Link"
+        data["url"] = raw_data
+    elif data_type == 'file':
+        data["type"] = "file"
+        kwargs['files'] = {'file': open(raw_data, 'rb')}
+    elif data_type == 'text':
+        data["type"] = "note"
+        data["title"] = "Note"
+        data["body"] = raw_data
+
+    print("Pushing to %s..." % (_nickname_for(device), ))
+    r = requests.post(PUSH_URL, **kwargs)
+
+    if r.status_code != 200:
+        raise PushbulletException("Failed with status code %d" % (r.status_code, ))
+
+
+def _data_type(argument):
+    if os.path.isfile(argument):
+        return "file"
+    elif URL_RE.search(argument):
+        return "url"
+    else:
+        return "text"
+
+
+def main(args):
+    device = None
+
+    api_key = _get_api_key()
+
+    if not args.all:
+        devices = _get_devices(api_key)
+
+        if len(devices) < 1:
+            print("You don't have any devices!")
+            print("Add one at <https://www.pushbullet.com/>.")
+            return 1
+
+        if args.interactive:
+            device = _prompt_device(devices)
+        elif args.device:
+            devices_by_names = {_nickname_for(d): d for d in devices}
+            if args.device not in devices_by_names:
+                print("Unknown device %s. Available devices: %s" % (
+                    args.device, ', '.join(devices_by_names)))
+                return 1
+            device = devices_by_names[args.device]
+
+    if not args.msg:
+        arg = sys.stdin.read()
+        data_type = 'text'
+    else:
+        arg = " ".join(args.msg)
+        data_type = _data_type(arg)
+
+    _push(api_key, device, arg, data_type)
+
+    return 0
+
+if __name__ == '__main__':
+    try:
+        exit(main(_parse_args()))
+    except PushbulletException as e:
+        print e.message
         exit(1)
-
-    push_to = devices_by_names[args.device]
-
-# push!
-# =====
-
-print("Pushing to " + nickname_for(push_to) + "...")
-
-data = {}
-
-if push_to:
-    data["device_iden"] = push_to[u"iden"]
-
-file = None
-
-argument = " ".join(args.msg)
-
-if is_url(argument):
-    data["type"] = "link"
-    data["title"] = "Link"
-    data["url"] = argument
-elif os.path.isfile(argument):
-    data["type"] = "file"
-    file = argument
-else:
-    data["type"] = "note"
-    data["title"] = "Note"
-    data["body"] = argument
-
-r = None
-if file is None:
-    r = requests.post(
-        PUSH_URL,
-        auth=(api_key, ""),
-        data=data
-    )
-else:
-    r = requests.post(
-        PUSH_URL,
-        auth=(api_key, ""),
-        data=data,
-        files={"file": open(file, "rb")}
-    )
-
-if r.status_code == 200:
-    print("Pushed!")
-else:
-    print("Failed with status code " + str(r.status_code) + ".")
-    exit(1)

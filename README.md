@@ -10,6 +10,10 @@ You can clone this repo and then add the following to your bashrc (or your zshrc
     $ echo 'alias pushbullet="/path/to/pushbullet-cli/pushbullet.py'" >> ~/.bashrc
     $ source ~/.bashrc
 
+Push stdin:
+
+    $ echo "hello" | pushbullet [-a/-d/-i]
+
 Push text:
 
     $ pushbullet [-a/-d/-i] burritos
