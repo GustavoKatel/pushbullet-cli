@@ -7,6 +7,7 @@ import re
 import sys
 
 PUSH_URL = "https://api.pushbullet.com/api/pushes"
+DEVICE_URL = "https://api.pushbullet.com/api/devices"
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
 URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
 
@@ -31,10 +32,13 @@ def _parse_args():
     parser.add_argument('msg', metavar='message', nargs='*')
 
     devgroup = parser.add_mutually_exclusive_group()
-    devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
-    devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
+    devgroup.add_argument('-a', '--all', default=False, action='store_true',
+                          help='Push to all devices')
+    devgroup.add_argument('-i', '--interactive', default=False,
+                          action='store_true',
                           help='Interactively ask for device to push to')
-    devgroup.add_argument('-d', '--device', type=str, default=None, help='Device name to push to')
+    devgroup.add_argument('-d', '--device', type=str, default=None,
+                          help='Device name to push to')
 
     return parser.parse_args()
 
@@ -54,13 +58,14 @@ def _get_api_key():
 
 
 def _get_devices(api_key):
-    r = requests.get("https://api.pushbullet.com/api/devices", auth=(api_key, ""))
+    r = requests.get(DEVICE_URL, auth=(api_key, ""))
     if (r.status_code == 401) or (r.status_code == 403):
         raise PushbulletException("Bad API key. Check %s." % (KEY_PATH, ))
     elif r.status_code != 200:
-        raise PushbulletException("Request failed with code %d." % (r.status_code, ))
+        raise PushbulletException("Request failed with code %d." %
+                                  (r.status_code, ))
 
-    return  r.json()[u"devices"]
+    return r.json()[u"devices"]
 
 
 def _prompt_device(devices):
@@ -106,7 +111,8 @@ def _push(api_key, device, raw_data, data_type):
     r = requests.post(PUSH_URL, **kwargs)
 
     if r.status_code != 200:
-        raise PushbulletException("Failed with status code %d" % (r.status_code, ))
+        raise PushbulletException("Failed with status code %d" %
+                                  (r.status_code, ))
 
 
 def _data_type(argument):
