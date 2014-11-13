@@ -30,7 +30,7 @@ def _parse_args():
     parser = argparse.ArgumentParser(description='Pushbullet')
     parser.add_argument('msg', metavar='message', nargs='*')
 
-    devgroup = parser.add_mutually_exclusive_group(required=True)
+    devgroup = parser.add_mutually_exclusive_group()
     devgroup.add_argument('-a', '--all', default=False, action='store_true', help='Push to all devices')
     devgroup.add_argument('-i', '--interactive', default=False, action='store_true',
                           help='Interactively ask for device to push to')

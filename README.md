@@ -10,15 +10,22 @@ You can clone this repo and then add the following to your bashrc (or your zshrc
     $ echo 'alias pushbullet="/path/to/pushbullet-cli/pushbullet.py'" >> ~/.bashrc
     $ source ~/.bashrc
 
-Push stdin:
+Push stdin to all devices:
 
-    $ echo "hello" | pushbullet [-a/-d/-i]
+    $ echo "hello" | pushbullet
 
-Push text:
+Push text to all devices:
 
-    $ pushbullet [-a/-d/-i] burritos
-    $ pushbullet [-a/-d/-i] "I love burritos"
-    $ pushbullet [-a/-d/-i] Make sure you remember to eat a burrito
+    $ pushbullet burritos
+    $ pushbullet -a "I love burritos"
+
+Pick a device to push to:
+
+    $ pushbullet -d "iPhone" iPhones cannot eat burritos
+
+Interactively decide which device:
+
+    $ pushbullet -i Make sure you remember to eat a burrito
 
 Push links:
 
@@ -32,11 +39,11 @@ Push files:
 
 Devices
 -------
+
 You should use one of the three flags -a, -d or -i to specify a device.
+
 * -a will push to all devices.
 * -d [name] will push to a specific device by name.
 * -i will prompt you to choose to which device you want to push.
 
 The first time you run this, you'll be asked for your API key, which will be saved in *~/.pushbulletkey*.
-
-I'm not too experienced with Python, so please feel free to send a pull request!
