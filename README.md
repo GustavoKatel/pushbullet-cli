@@ -5,37 +5,35 @@ Use [Pushbullet](https://www.pushbullet.com/) from the command line. In beta!
 
 *Requires `requests` to be installed.*
 
-You can clone this repo and then add the following to your bashrc (or your zshrc, or whatever):
-
-    $ echo 'alias pushbullet="/path/to/pushbullet-cli/pushbullet.py'" >> ~/.bashrc
-    $ source ~/.bashrc
+Install the package by typing `./setup.py install`. This will install the package in your current Python environment. 
+Alternatively, you can also use `./setup.py develop` in order to install the package in develop mode, which means that the installed file is linked to the source tree.
 
 Push stdin to all devices:
 
-    $ echo "hello" | pushbullet
+    $ echo "hello" | pb
 
 Push text to all devices:
 
-    $ pushbullet burritos
-    $ pushbullet -a "I love burritos"
+    $ pb burritos
+    $ pb -a "I love burritos"
 
 Pick a device to push to:
 
-    $ pushbullet -d "iPhone" iPhones cannot eat burritos
+    $ pb -d "iPhone" iPhones cannot eat burritos
 
 Interactively decide which device:
 
-    $ pushbullet -i Make sure you remember to eat a burrito
+    $ pb -i Make sure you remember to eat a burrito
 
 Push links:
 
-    $ pushbullet [-a/-d/-i] http://losaltostaqueria.org/
-    $ pushbullet [-a/-d/-i] https://www.pushbullet.com/
+    $ pb [-a/-d/-i] http://losaltostaqueria.org/
+    $ pb [-a/-d/-i] https://www.pushbullet.com/
 
 Push files:
 
-    $ pushbullet [-a/-d/-i] /path/to/burrito_photo.jpg
-    $ pushbullet [-a/-d/-i] /path/to/burrito_recipe.txt
+    $ pb [-a/-d/-i] /path/to/burrito_photo.jpg
+    $ pb [-a/-d/-i] /path/to/burrito_recipe.txt
 
 Devices
 -------

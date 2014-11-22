@@ -1,15 +1,25 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 import os.path
 import requests
 import re
 import sys
+from contextlib import contextmanager
 
 PUSH_URL = "https://api.pushbullet.com/api/pushes"
 DEVICE_URL = "https://api.pushbullet.com/api/devices"
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
 URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
+
+@contextmanager
+def private_files():
+    oldmask = os.umask(077)
+    try:
+        yield
+    finally:
+        os.umask(oldmask)
 
 
 class PushbulletException(Exception):
@@ -48,7 +58,7 @@ def _get_api_key():
         print("What's your API key?")
         print("Find it at <https://www.pushbullet.com/account>.")
         api_key = raw_input("> ").strip()
-        with open(KEY_PATH, "w") as api_file:
+        with private_files(), open(KEY_PATH, "w") as api_file:
             api_file.write(api_key)
 
         return api_key
@@ -124,8 +134,9 @@ def _data_type(argument):
         return "text"
 
 
-def main(args):
+def main():
     device = None
+    args = _parse_args()
 
     api_key = _get_api_key()
 
@@ -157,10 +168,3 @@ def main(args):
     _push(api_key, device, arg, data_type)
 
     return 0
-
-if __name__ == '__main__':
-    try:
-        exit(main(_parse_args()))
-    except PushbulletException as e:
-        print e.message
-        exit(1)
