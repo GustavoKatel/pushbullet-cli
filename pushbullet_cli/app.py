@@ -124,8 +124,9 @@ def _data_type(argument):
         return "text"
 
 
-def main(args):
+def main():
     device = None
+    args = _parse_args()
 
     api_key = _get_api_key()
 
@@ -157,10 +158,3 @@ def main(args):
     _push(api_key, device, arg, data_type)
 
     return 0
-
-if __name__ == '__main__':
-    try:
-        exit(main(_parse_args()))
-    except PushbulletException as e:
-        print e.message
-        exit(1)
