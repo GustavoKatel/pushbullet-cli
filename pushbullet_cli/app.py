@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import argparse
+from functools import wraps
 import os
 import os.path
-import requests
+from pushbullet import PushBullet
 import re
 import sys
 from contextlib import contextmanager
 
-PUSH_URL = "https://api.pushbullet.com/api/pushes"
-DEVICE_URL = "https://api.pushbullet.com/api/devices"
+
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
 URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
+
 
 @contextmanager
 def private_files():
@@ -26,29 +27,30 @@ class PushbulletException(Exception):
     pass
 
 
-def _nickname_for(device):
-    if not device:
-        return "all devices"
+def raise_for_status(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        success, data = f(*args, **kwargs)
+        if not success:
+            raise PushbulletException(
+                "{0} failed: {1}".format(f, data))
 
-    extras = device[u"extras"]
-    if u"nickname" in extras:
-        return extras[u"nickname"]
-    else:
-        return extras[u"model"]
+        return data
+    return wrapper
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(description='Pushbullet')
-    parser.add_argument('msg', metavar='message', nargs='*')
+    parser = argparse.ArgumentParser(description="Pushbullet")
+    parser.add_argument("msg", metavar="message", nargs="*")
 
     devgroup = parser.add_mutually_exclusive_group()
-    devgroup.add_argument('-a', '--all', default=False, action='store_true',
-                          help='Push to all devices')
-    devgroup.add_argument('-i', '--interactive', default=False,
-                          action='store_true',
-                          help='Interactively ask for device to push to')
-    devgroup.add_argument('-d', '--device', type=str, default=None,
-                          help='Device name to push to')
+    devgroup.add_argument("-a", "--all", default=False, action="store_true",
+                          help="Push to all devices")
+    devgroup.add_argument("-i", "--interactive", default=False,
+                          action="store_true",
+                          help="Interactively ask for device to push to")
+    devgroup.add_argument("-d", "--device", type=str, default=None,
+                          help="Device name to push to")
 
     return parser.parse_args()
 
@@ -67,21 +69,9 @@ def _get_api_key():
             return api_file.read()
 
 
-def _get_devices(api_key):
-    r = requests.get(DEVICE_URL, auth=(api_key, ""))
-    if (r.status_code == 401) or (r.status_code == 403):
-        raise PushbulletException("Bad API key. Check %s." % (KEY_PATH, ))
-    elif r.status_code != 200:
-        raise PushbulletException("Request failed with code %d." %
-                                  (r.status_code, ))
-
-    return r.json()[u"devices"]
-
-
 def _prompt_device(devices):
     for i, device in enumerate(devices):
-        nickname = _nickname_for(device)
-        print ("[%d] %s" % (i, nickname))
+        print("[{0}] {1}".format(i, device.nickname))
 
     while True:
         input = raw_input("Push to which device? ").strip()
@@ -94,35 +84,21 @@ def _prompt_device(devices):
                 return devices[choice]
 
 
-def _push(api_key, device, raw_data, data_type):
+def _push(pb, device, raw_data, data_type):
     data = {}
+    if device is not None:
+        data["device"] = device
 
-    if device:
-        data["device_iden"] = device[u"iden"]
+    if data_type == "file":
+        with open(raw_data, "rb") as f:
+            file_data = pb.upload_file(f, raw_data)
 
-    kwargs = {
-        'auth': (api_key, ""),
-        'data': data
-    }
-
-    if data_type == 'url':
-        data["type"] = "link"
-        data["title"] = "Link"
-        data["url"] = raw_data
-    elif data_type == 'file':
-        data["type"] = "file"
-        kwargs['files'] = {'file': open(raw_data, 'rb')}
-    elif data_type == 'text':
-        data["type"] = "note"
-        data["title"] = "Note"
-        data["body"] = raw_data
-
-    print("Pushing to %s..." % (_nickname_for(device), ))
-    r = requests.post(PUSH_URL, **kwargs)
-
-    if r.status_code != 200:
-        raise PushbulletException("Failed with status code %d" %
-                                  (r.status_code, ))
+        data.update(file_data)
+        pb.push_file(**data)
+    elif data_type == "url":
+        pb.push_link(title=raw_data, url=raw_data, **data)
+    else:
+        pb.push_note(title="Note", body=raw_data, **data)
 
 
 def _data_type(argument):
@@ -139,32 +115,38 @@ def main():
     args = _parse_args()
 
     api_key = _get_api_key()
+    pb = PushBullet(api_key)
+
+    # Decorate the object method so that they"ll raise exceptions when
+    # they fail instead of returning a tuple
+    for method in ["push_file", "upload_file", "push_link", "push_note"]:
+        assert hasattr(pb, method)
+        setattr(pb, method, raise_for_status(getattr(pb, method)))
 
     if not args.all:
-        devices = _get_devices(api_key)
-
-        if len(devices) < 1:
+        if len(pb.devices) < 1:
             print("You don't have any devices!")
             print("Add one at <https://www.pushbullet.com/>.")
             return 1
 
         if args.interactive:
-            device = _prompt_device(devices)
+            device = _prompt_device(pb.devices)
         elif args.device:
-            devices_by_names = {_nickname_for(d): d for d in devices}
+            devices_by_names = {d.nickname: d for d in pb.devices}
             if args.device not in devices_by_names:
                 print("Unknown device %s. Available devices: %s" % (
-                    args.device, ', '.join(devices_by_names)))
+                    args.device, ", ".join(devices_by_names)))
                 return 1
             device = devices_by_names[args.device]
 
     if not args.msg:
+        print("Enter your message: ")
         arg = sys.stdin.read()
-        data_type = 'text'
+        data_type = "text"
     else:
         arg = " ".join(args.msg)
         data_type = _data_type(arg)
 
-    _push(api_key, device, arg, data_type)
+    _push(pb, device, arg, data_type)
 
     return 0
