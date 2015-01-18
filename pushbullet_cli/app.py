@@ -16,7 +16,7 @@ URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
 
 @contextmanager
 def private_files():
-    oldmask = os.umask(077)
+    oldmask = os.umask(0o77)
     try:
         yield
     finally:
