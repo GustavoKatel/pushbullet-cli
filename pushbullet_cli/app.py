@@ -8,6 +8,7 @@ from pushbullet import PushBullet
 import re
 import sys
 from contextlib import contextmanager
+from ._compat import read_line
 
 
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
@@ -59,7 +60,7 @@ def _get_api_key():
     if not os.path.isfile(KEY_PATH):
         print("What's your API key?")
         print("Find it at <https://www.pushbullet.com/account>.")
-        api_key = raw_input("> ").strip()
+        api_key = read_line("> ").strip()
         with private_files(), open(KEY_PATH, "w") as api_file:
             api_file.write(api_key)
 
