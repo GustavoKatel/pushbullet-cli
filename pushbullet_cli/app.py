@@ -96,6 +96,7 @@ def _push(pb, channel, device, raw_data, data_type):
     if data_type == "file":
         with open(raw_data, "rb") as f:
             file_data = pb.upload_file(f, raw_data)
+            
         data.update(file_data)
 
     if channel is not None:
@@ -154,7 +155,6 @@ def main():
                     args.channel, ", ".join(channels_by_names)))
                 return 1
             channel = channels_by_names[args.channel]
-            channel.push_note("jiji", "jojo")
 
     if not args.msg:
         print("Enter your message: ")

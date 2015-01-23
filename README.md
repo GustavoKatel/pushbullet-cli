@@ -3,7 +3,7 @@ Pushbullet CLI interface
 
 Use [Pushbullet](https://www.pushbullet.com/) from the command line. In beta!
 
-*Requires `requests` to be installed.*
+*Requires `requests` to be installed.*  
 *Requires `pip` to be installed.*
 
 Install the package by typing `./setup.py install`. This will install the package in your current Python environment. 
