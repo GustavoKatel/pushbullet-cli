@@ -52,6 +52,8 @@ def _parse_args():
                           help="Interactively ask for device to push to")
     devgroup.add_argument("-d", "--device", type=str, default=None,
                           help="Device name to push to")
+    devgroup.add_argument("-c", "--channel", type=str, default=None,
+                          help="Channel name to push to")
 
     return parser.parse_args()
 
@@ -85,16 +87,22 @@ def _prompt_device(devices):
                 return devices[choice]
 
 
-def _push(pb, device, raw_data, data_type):
+def _push(pb, channel, device, raw_data, data_type):
     data = {}
     if device is not None:
         data["device"] = device
 
+    # upload file if necessary
     if data_type == "file":
         with open(raw_data, "rb") as f:
             file_data = pb.upload_file(f, raw_data)
-
+            
         data.update(file_data)
+
+    if channel is not None:
+        pb = channel
+
+    if data_type == "file":
         pb.push_file(**data)
     elif data_type == "url":
         pb.push_link(title=raw_data, url=raw_data, **data)
@@ -113,6 +121,7 @@ def _data_type(argument):
 
 def main():
     device = None
+    channel = None
     args = _parse_args()
 
     api_key = _get_api_key()
@@ -139,6 +148,13 @@ def main():
                     args.device, ", ".join(devices_by_names)))
                 return 1
             device = devices_by_names[args.device]
+        elif args.channel:
+            channels_by_names = {d.channel_tag: d for d in pb.channels}
+            if args.channel not in channels_by_names:
+                print("Unknown channel %s. Available channels: %s" % (
+                    args.channel, ", ".join(channels_by_names)))
+                return 1
+            channel = channels_by_names[args.channel]
 
     if not args.msg:
         print("Enter your message: ")
@@ -148,6 +164,6 @@ def main():
         arg = " ".join(args.msg)
         data_type = _data_type(arg)
 
-    _push(pb, device, arg, data_type)
+    _push(pb, channel, device, arg, data_type)
 
     return 0
