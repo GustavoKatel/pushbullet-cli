@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-from functools import wraps
 import os
 import os.path
 from pushbullet import PushBullet
@@ -22,22 +21,6 @@ def private_files():
         yield
     finally:
         os.umask(oldmask)
-
-
-class PushbulletException(Exception):
-    pass
-
-
-def raise_for_status(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        success, data = f(*args, **kwargs)
-        if not success:
-            raise PushbulletException(
-                "{0} failed: {1}".format(f, data))
-
-        return data
-    return wrapper
 
 
 def _parse_args():
@@ -126,12 +109,6 @@ def main():
 
     api_key = _get_api_key()
     pb = PushBullet(api_key)
-
-    # Decorate the object method so that they"ll raise exceptions when
-    # they fail instead of returning a tuple
-    for method in ["push_file", "upload_file", "push_link", "push_note"]:
-        assert hasattr(pb, method)
-        setattr(pb, method, raise_for_status(getattr(pb, method)))
 
     if not args.all:
         if len(pb.devices) < 1:
