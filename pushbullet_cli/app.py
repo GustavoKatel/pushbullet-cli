@@ -52,7 +52,7 @@ def _get_api_key():
         return api_key
     else:
         with open(KEY_PATH, "r") as api_file:
-            return api_file.read()
+            return api_file.readline().rstrip()
 
 
 def _prompt_device(devices):
