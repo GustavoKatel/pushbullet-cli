@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="Pushbullet CLI",
+    name="pushbullet-cli",
     description='Command line tool for controlling PushBullet',
     author='Roey Darwish Dror',
     author_email='roey.ghost@gmail.com',
