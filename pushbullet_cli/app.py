@@ -60,9 +60,9 @@ def _prompt_device(devices):
         print("[{0}] {1}".format(i, device.nickname))
 
     while True:
-        input = raw_input("Push to which device? ").strip()
+        raw_choice = read_line("Push to which device? ").strip()
         try:
-            choice = int(input)
+            choice = int(raw_choice)
         except (ValueError, IndexError):
             pass
         else:
