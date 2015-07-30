@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import click
+import getpass
 import os
 import os.path
 from pushbullet import PushBullet
@@ -72,6 +73,13 @@ def _push(data_type, message=None, channel=None, device=None, file_path=None):
 @click.group()
 def main():
     pass
+
+
+@main.command("set-key")
+def set_key():
+    key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
+    with private_files(), open(KEY_PATH, "w") as f:
+        f.write(key)
 
 
 @main.group()
