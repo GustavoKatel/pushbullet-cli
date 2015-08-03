@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
-import argparse
+import click
+import getpass
 import os
 import os.path
 from pushbullet import PushBullet
-import re
 import sys
 from contextlib import contextmanager
-from ._compat import read_line
 
 
 KEY_PATH = os.path.expanduser("~/.pushbulletkey")
-URL_RE = re.compile(r"^[a-zA-Z]+://.+$")
 
 
 @contextmanager
@@ -23,63 +21,49 @@ def private_files():
         os.umask(oldmask)
 
 
-def _parse_args():
-    parser = argparse.ArgumentParser(description="Pushbullet")
-    parser.add_argument("msg", metavar="message", nargs="*")
+class NoApiKey(click.ClickException):
+    exit_code = 1
 
-    devgroup = parser.add_mutually_exclusive_group()
-    devgroup.add_argument("-a", "--all", default=False, action="store_true",
-                          help="Push to all devices")
-    devgroup.add_argument("-i", "--interactive", default=False,
-                          action="store_true",
-                          help="Interactively ask for device to push to")
-    devgroup.add_argument("-d", "--device", type=str, default=None,
-                          help="Device name to push to")
-    devgroup.add_argument("-c", "--channel", type=str, default=None,
-                          help="Channel name to push to")
-
-    return parser.parse_args()
+    def __init__(self):
+        msg = ("No API key was specified. Either run pb set_key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
+               "You can find your key at <https://www.pushbullet.com/account>.")
+        super(NoApiKey, self).__init__(msg)
 
 
-def _get_api_key():
+class InvalidDevice(click.ClickException):
+    exit_code = 1
+
+    def __init__(self, index, devices):
+        super(InvalidDevice, self).__init__("Invalid device number {0}. Choose one of the following devices:\n{1}".format(
+            index, "\n".join("{0}. {1}".format(i, device.nickname) for i, device in enumerate(devices))))
+
+
+def _get_pb():
+    if 'PUSHBULLET_KEY' in os.environ:
+        return PushBullet(os.environ['PUSHBULLET_KEY'])
+
     if not os.path.isfile(KEY_PATH):
-        print("What's your API key?")
-        print("Find it at <https://www.pushbullet.com/account>.")
-        api_key = read_line("> ").strip()
-        with private_files(), open(KEY_PATH, "w") as api_file:
-            api_file.write(api_key)
+        raise NoApiKey()
 
-        return api_key
-    else:
-        with open(KEY_PATH, "r") as api_file:
-            return api_file.readline().rstrip()
+    with open(KEY_PATH, "r") as api_file:
+        return PushBullet(api_file.readline().rstrip())
 
 
-def _prompt_device(devices):
-    for i, device in enumerate(devices):
-        print("[{0}] {1}".format(i, device.nickname))
+def _push(data_type, message=None, channel=None, device=None, file_path=None):
+    pb = _get_pb()
 
-    while True:
-        raw_choice = read_line("Push to which device? ").strip()
-        try:
-            choice = int(raw_choice)
-        except (ValueError, IndexError):
-            pass
-        else:
-            if 0 <= choice < len(devices):
-                return devices[choice]
-
-
-def _push(pb, channel, device, raw_data, data_type):
     data = {}
     if device is not None:
-        data["device"] = device
+        try:
+            pb = pb.devices[device]
+        except IndexError:
+            raise InvalidDevice(device, pb.devices)
 
     # upload file if necessary
     if data_type == "file":
-        with open(raw_data, "rb") as f:
-            file_data = pb.upload_file(f, raw_data)
-            
+        with open(file_path, "rb") as f:
+            file_data = pb.upload_file(f, os.path.basename(file_path))
+
         data.update(file_data)
 
     if channel is not None:
@@ -88,59 +72,81 @@ def _push(pb, channel, device, raw_data, data_type):
     if data_type == "file":
         pb.push_file(**data)
     elif data_type == "url":
-        pb.push_link(title=raw_data, url=raw_data, **data)
+        pb.push_link(title=message, url=message, **data)
+    elif data_type == "text":
+        pb.push_note(title="Note", body=message, **data)
     else:
-        pb.push_note(title="Note", body=raw_data, **data)
+        raise Exception("Unknown data type")
 
 
-def _data_type(argument):
-    if os.path.isfile(argument):
-        return "file"
-    elif URL_RE.search(argument):
-        return "url"
-    else:
-        return "text"
-
-
+@click.group()
 def main():
-    device = None
-    channel = None
-    args = _parse_args()
+    pass
 
-    api_key = _get_api_key()
-    pb = PushBullet(api_key)
 
-    if not args.all:
-        if len(pb.devices) < 1:
-            print("You don't have any devices!")
-            print("Add one at <https://www.pushbullet.com/>.")
-            return 1
+@main.command("purge", help="Delete all your pushes.")
+def purge():
+    pb = _get_pb()
 
-        if args.interactive:
-            device = _prompt_device(pb.devices)
-        elif args.device:
-            devices_by_names = {d.nickname: d for d in pb.devices}
-            if args.device not in devices_by_names:
-                print("Unknown device %s. Available devices: %s" % (
-                    args.device, ", ".join(devices_by_names)))
-                return 1
-            device = devices_by_names[args.device]
-        elif args.channel:
-            channels_by_names = {d.channel_tag: d for d in pb.channels}
-            if args.channel not in channels_by_names:
-                print("Unknown channel %s. Available channels: %s" % (
-                    args.channel, ", ".join(channels_by_names)))
-                return 1
-            channel = channels_by_names[args.channel]
+    pushes = pb.get_pushes()
+    for current_push in pushes[1]:
+        if current_push['active']:
+            pb.delete_push(current_push['iden'])
 
-    if not args.msg:
+
+@main.command("list-devices", help="List your devices")
+def purge():
+    pb = _get_pb()
+    for i, device in enumerate(pb.devices):
+        print("{0}. {1}".format(i, device.nickname))
+
+
+@main.command("set-key", help="Set your API key.")
+def set_key():
+    key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
+    with private_files(), open(KEY_PATH, "w") as f:
+        f.write(key)
+
+
+@main.group(help="Push something.")
+@click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
+@click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
+@click.pass_context
+def push(ctx, device, channel):
+    if device is not None and channel is not None:
+        click.echo("Please specify either device, channel or non of them.")
+        ctx.exit()
+
+
+@push.command()
+@click.argument('source', type=click.Path(exists=True))
+@click.pass_context
+def file(ctx, source):
+    kwargs = dict(ctx.parent.params)
+    kwargs['file_path'] = click.format_filename(source)
+    kwargs['data_type'] = 'file'
+    _push(**kwargs)
+
+
+@push.command()
+@click.argument('message', default=None, required=False)
+@click.pass_context
+def text(ctx, message):
+    if message is None:
         print("Enter your message: ")
-        arg = sys.stdin.read()
-        data_type = "text"
-    else:
-        arg = " ".join(args.msg)
-        data_type = _data_type(arg)
+        message = sys.stdin.read()
 
-    _push(pb, channel, device, arg, data_type)
+    kwargs = dict(ctx.parent.params)
+    kwargs['message'] = message
+    kwargs['data_type'] = 'text'
+    _push(**kwargs)
 
-    return 0
+
+@push.command()
+@click.argument('url')
+@click.pass_context
+def link(ctx, url):
+    kwargs = dict(ctx.parent.params)
+    kwargs['message'] = url
+    kwargs['data_type'] = 'url'
+    _push(**kwargs)

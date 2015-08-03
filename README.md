@@ -1,53 +1,36 @@
 Pushbullet CLI interface
 ========================
 
-Use [Pushbullet](https://www.pushbullet.com/) from the command line. In beta!
+Use [Pushbullet](https://www.pushbullet.com/) from the command line.
 
-*Requires `requests` to be installed.*  
-*Requires `pip` to be installed.*
+First of all, set your API key by running:
 
-Install the package by typing `./setup.py install`. This will install the package in your current Python environment. 
-Alternatively, you can also use `./setup.py develop` in order to install the package in develop mode, which means that the installed file is linked to the source tree.
+    $ pb set-key
+
+Then pasting your API key at the prompt.
 
 Push stdin to all devices:
 
-    $ echo "hello" | pb
+    $ echo "hello" | pb push text
 
 Push text to all devices:
 
-    $ pb burritos
-    $ pb -a "I love burritos"
+    $ pb push text "I love burritos"
 
 Pick a device to push to:
 
-    $ pb -d "iPhone" iPhones cannot eat burritos
-
-Interactively decide which device:
-
-    $ pb -i Make sure you remember to eat a burrito
+    $ pb list-devices
+    # Find the index of your desired device
+    $ pb push -d 0 text "iPhones cannot eat burritos"
 
 Push links:
 
-    $ pb [-a/-d/-i] http://losaltostaqueria.org/
-    $ pb [-a/-d/-i] https://www.pushbullet.com/
+    $ pb push link https://www.pushbullet.com/
 
 Push files:
 
-    $ pb [-a/-d/-i] /path/to/burrito_photo.jpg
-    $ pb [-a/-d/-i] /path/to/burrito_recipe.txt
+    $ pb push file /path/to/burrito_photo.jpg
 
 Push to all subscribers of channel:
 
-    $ pb -c "CHANNEL" Why burritos are better than tacos
-
-Devices
--------
-
-You should use one of the three flags -a, -d or -i to specify a device.
-
-* -a will push to all devices.
-* -d [name] will push to a specific device by name.
-* -i will prompt you to choose to which device you want to push.
-* -c [name] will push to a specific channel by name.
-
-The first time you run this, you'll be asked for your API key, which will be saved in *~/.pushbulletkey*.
+    $ pb push -c "CHANNEL" text "Why burritos are better than tacos"
