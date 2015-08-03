@@ -30,6 +30,14 @@ class NoApiKey(click.ClickException):
         super(NoApiKey, self).__init__(msg)
 
 
+class InvalidDevice(click.ClickException):
+    exit_code = 1
+
+    def __init__(self, index, devices):
+        super(InvalidDevice, self).__init__("Invalid device number {0}. Choose one of the following devices:\n{1}".format(
+            index, "\n".join("{0}. {1}".format(i, device.nickname) for i, device in enumerate(devices))))
+
+
 def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
         return PushBullet(os.environ['PUSHBULLET_KEY'])
@@ -46,7 +54,10 @@ def _push(data_type, message=None, channel=None, device=None, file_path=None):
 
     data = {}
     if device is not None:
-        data["device"] = device
+        try:
+            pb = pb.devices[device]
+        except IndexError:
+            raise InvalidDevice(device, pb.devices)
 
     # upload file if necessary
     if data_type == "file":
@@ -98,7 +109,7 @@ def set_key():
 
 
 @main.group(help="Push something.")
-@click.option("-d", "--device", type=str, default=None, help="Push to a specific device instead of all devices.")
+@click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.pass_context
 def push(ctx, device, channel):
