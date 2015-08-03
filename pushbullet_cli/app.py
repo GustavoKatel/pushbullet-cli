@@ -21,30 +21,28 @@ def private_files():
         os.umask(oldmask)
 
 
-class NoApiKey(Exception):
-    pass
+class NoApiKey(click.ClickException):
+    exit_code = 1
+
+    def __init__(self):
+        msg = ("No API key was specified. Either run pb set_key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
+               "You can find your key at <https://www.pushbullet.com/account>.")
+        super(NoApiKey, self).__init__(msg)
 
 
-def _get_api_key():
+def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
-        return os.environ['PUSHBULLET_KEY']
+        return PushBullet(os.environ['PUSHBULLET_KEY'])
 
     if not os.path.isfile(KEY_PATH):
         raise NoApiKey()
 
     with open(KEY_PATH, "r") as api_file:
-        return api_file.readline().rstrip()
+        return PushBullet(api_file.readline().rstrip())
 
 
 def _push(data_type, message=None, channel=None, device=None, file_path=None):
-    try:
-        api_key = _get_api_key()
-    except NoApiKey:
-        click.echo("No API key was specified. Either run pb set_key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.")
-        click.echo("You can find your key at <https://www.pushbullet.com/account>.")
-        return 1
-
-    pb = PushBullet(api_key)
+    pb = _get_pb()
 
     data = {}
     if device is not None:
@@ -75,14 +73,24 @@ def main():
     pass
 
 
-@main.command("set-key")
+@main.command("purge", help="Delete all your pushes.")
+def purge():
+    pb = _get_pb()
+
+    pushes = pb.get_pushes()
+    for current_push in pushes[1]:
+        if current_push['active']:
+            pb.delete_push(current_push['iden'])
+
+
+@main.command("set-key", help="Set your API key.")
 def set_key():
     key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
     with private_files(), open(KEY_PATH, "w") as f:
         f.write(key)
 
 
-@main.group()
+@main.group(help="Push something.")
 @click.option("-d", "--device", type=str, default=None, help="Push to a specific device instead of all devices.")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.pass_context
