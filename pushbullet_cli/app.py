@@ -49,7 +49,7 @@ def _get_pb():
         return PushBullet(api_file.readline().rstrip())
 
 
-def _push(data_type, message=None, channel=None, device=None, file_path=None):
+def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None):
     pb = _get_pb()
 
     data = {}
@@ -72,9 +72,9 @@ def _push(data_type, message=None, channel=None, device=None, file_path=None):
     if data_type == "file":
         pb.push_file(**data)
     elif data_type == "url":
-        pb.push_link(title=message, url=message, **data)
+        pb.push_link(title=title or message, url=message, **data)
     elif data_type == "text":
-        pb.push_note(title="Note", body=message, **data)
+        pb.push_note(title=title or "Note", body=message, **data)
     else:
         raise Exception("Unknown data type")
 
@@ -111,8 +111,9 @@ def set_key():
 @main.group(help="Push something.")
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
+@click.option("-t", "--title", type=str, default=None, help="Set a title.")
 @click.pass_context
-def push(ctx, device, channel):
+def push(ctx, title, device, channel):
     if device is not None and channel is not None:
         click.echo("Please specify either device, channel or non of them.")
         ctx.exit()
