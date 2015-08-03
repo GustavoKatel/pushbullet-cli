@@ -83,6 +83,13 @@ def purge():
             pb.delete_push(current_push['iden'])
 
 
+@main.command("list-devices", help="List your devices")
+def purge():
+    pb = _get_pb()
+    for i, device in enumerate(pb.devices):
+        print("{0}. {1}".format(i, device.nickname))
+
+
 @main.command("set-key", help="Set your API key.")
 def set_key():
     key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
