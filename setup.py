@@ -9,7 +9,7 @@ setup(
     url='https://github.com/r-darwish/pushbullet-cli',
     version="0.2.1",
     packages=find_packages(exclude=['tests']),
-    install_requires=['pushbullet.py >= 0.8.1', 'click'],
+    install_requires=['pushbullet.py >= 0.8.1', 'click', 'keyring'],
     entry_points={
         'console_scripts': ['pb = pushbullet_cli.app:main']
     },

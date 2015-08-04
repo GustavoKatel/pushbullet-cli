@@ -4,21 +4,9 @@ import click
 import getpass
 import os
 import os.path
+import keyring
 from pushbullet import PushBullet
 import sys
-from contextlib import contextmanager
-
-
-KEY_PATH = os.path.expanduser("~/.pushbulletkey")
-
-
-@contextmanager
-def private_files():
-    oldmask = os.umask(0o77)
-    try:
-        yield
-    finally:
-        os.umask(oldmask)
 
 
 class NoApiKey(click.ClickException):
@@ -42,11 +30,11 @@ def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
         return PushBullet(os.environ['PUSHBULLET_KEY'])
 
-    if not os.path.isfile(KEY_PATH):
+    password = keyring.get_password("pushbullet", "cli")
+    if not password:
         raise NoApiKey()
 
-    with open(KEY_PATH, "r") as api_file:
-        return PushBullet(api_file.readline().rstrip())
+    return PushBullet(password)
 
 
 def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None):
@@ -104,8 +92,7 @@ def purge():
 @main.command("set-key", help="Set your API key.")
 def set_key():
     key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
-    with private_files(), open(KEY_PATH, "w") as f:
-        f.write(key)
+    keyring.set_password("pushbullet", "cli", key)
 
 
 @main.group(help="Push something.")
