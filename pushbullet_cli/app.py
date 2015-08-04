@@ -95,6 +95,11 @@ def set_key():
     keyring.set_password("pushbullet", "cli", key)
 
 
+@main.command("delete-key", help="Remove your API key from the system keyring")
+def delete_key():
+    keyring.delete_password("pushbullet", "cli")
+
+
 @main.group(help="Push something.")
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
