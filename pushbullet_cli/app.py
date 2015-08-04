@@ -83,7 +83,7 @@ def purge():
 
 
 @main.command("list-devices", help="List your devices")
-def purge():
+def list_devices():
     pb = _get_pb()
     for i, device in enumerate(pb.devices):
         print("{0}. {1}".format(i, device.nickname))
