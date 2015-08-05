@@ -5,9 +5,20 @@ import getpass
 import os
 import os.path
 import keyring
-from pushbullet import PushBullet
+import pushbullet
 import sys
+from functools import wraps
 from .__version__ import __version__
+
+
+def _decode(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return f(*args, **kwargs).decode("ASCII")
+
+    return wrapper
+
+pushbullet.pushbullet.get_file_type = _decode(pushbullet.pushbullet.get_file_type)
 
 
 class NoApiKey(click.ClickException):
@@ -29,13 +40,13 @@ class InvalidDevice(click.ClickException):
 
 def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
-        return PushBullet(os.environ['PUSHBULLET_KEY'])
+        return pushbullet.PushBullet(os.environ['PUSHBULLET_KEY'])
 
     password = keyring.get_password("pushbullet", "cli")
     if not password:
         raise NoApiKey()
 
-    return PushBullet(password)
+    return pushbullet.PushBullet(password)
 
 
 def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None):
