@@ -7,6 +7,7 @@ import os.path
 import keyring
 from pushbullet import PushBullet
 import sys
+from .__version__ import __version__
 
 
 class NoApiKey(click.ClickException):
@@ -133,3 +134,8 @@ def push(title, device, channel, filename, link, arg):
         kwargs['data_type'] = 'text'
 
     _push(**kwargs)
+
+
+@main.command(help="Print version number.")
+def version():
+    print("PushBullet CLI, version " + __version__)
