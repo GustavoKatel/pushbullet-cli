@@ -100,46 +100,39 @@ def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
-@main.group(help="Push something.")
+@main.command(help="Push something.")
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
+@click.option("-f", "--file", "--filename", is_flag=True, help="The given argument is a name file to push")
+@click.option("-u", "--link", is_flag=True, help="The given argument URL")
+@click.argument('arg', default=None, required=False)
 @click.pass_context
-def push(ctx, title, device, channel):
+def push(ctx, title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
-        click.echo("Please specify either device, channel or non of them.")
+        click.echo("--channel and --device cannot be used together")
         ctx.exit()
 
+    kwargs = {
+        'title': title,
+        'device': device,
+        'channel': channel,
+    }
+    if filename and link:
+        click.echo("--file and --link cannot be used together")
+        ctx.exit()
+    elif filename:
+        kwargs['file_path'] = arg
+        kwargs['data_type'] = 'file'
+    elif link:
+        kwargs['message'] = arg
+        kwargs['data_type'] = 'url'
+    else:
+        if arg is None:
+            print("Enter your message: ")
+            arg = sys.stdin.read()
 
-@push.command()
-@click.argument('source', type=click.Path(exists=True))
-@click.pass_context
-def file(ctx, source):
-    kwargs = dict(ctx.parent.params)
-    kwargs['file_path'] = click.format_filename(source)
-    kwargs['data_type'] = 'file'
-    _push(**kwargs)
+        kwargs['message'] = arg
+        kwargs['data_type'] = 'text'
 
-
-@push.command()
-@click.argument('message', default=None, required=False)
-@click.pass_context
-def text(ctx, message):
-    if message is None:
-        print("Enter your message: ")
-        message = sys.stdin.read()
-
-    kwargs = dict(ctx.parent.params)
-    kwargs['message'] = message
-    kwargs['data_type'] = 'text'
-    _push(**kwargs)
-
-
-@push.command()
-@click.argument('url')
-@click.pass_context
-def link(ctx, url):
-    kwargs = dict(ctx.parent.params)
-    kwargs['message'] = url
-    kwargs['data_type'] = 'url'
     _push(**kwargs)
