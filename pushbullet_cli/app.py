@@ -107,11 +107,9 @@ def delete_key():
 @click.option("-f", "--file", "--filename", is_flag=True, help="The given argument is a name file to push")
 @click.option("-u", "--link", is_flag=True, help="The given argument URL")
 @click.argument('arg', default=None, required=False)
-@click.pass_context
-def push(ctx, title, device, channel, filename, link, arg):
+def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
-        click.echo("--channel and --device cannot be used together")
-        ctx.exit()
+        raise click.ClickException("--channel and --device cannot be used together")
 
     kwargs = {
         'title': title,
@@ -119,8 +117,7 @@ def push(ctx, title, device, channel, filename, link, arg):
         'channel': channel,
     }
     if filename and link:
-        click.echo("--file and --link cannot be used together")
-        ctx.exit()
+        raise click.ClickException("--file and --link cannot be used together")
     elif filename:
         kwargs['file_path'] = arg
         kwargs['data_type'] = 'file'
