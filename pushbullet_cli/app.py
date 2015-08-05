@@ -5,8 +5,20 @@ import getpass
 import os
 import os.path
 import keyring
-from pushbullet import PushBullet
+import pushbullet
 import sys
+from functools import wraps
+from .__version__ import __version__
+
+
+def _decode(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return f(*args, **kwargs).decode("ASCII")
+
+    return wrapper
+
+pushbullet.pushbullet.get_file_type = _decode(pushbullet.pushbullet.get_file_type)
 
 
 class NoApiKey(click.ClickException):
@@ -28,13 +40,13 @@ class InvalidDevice(click.ClickException):
 
 def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
-        return PushBullet(os.environ['PUSHBULLET_KEY'])
+        return pushbullet.PushBullet(os.environ['PUSHBULLET_KEY'])
 
     password = keyring.get_password("pushbullet", "cli")
     if not password:
         raise NoApiKey()
 
-    return PushBullet(password)
+    return pushbullet.PushBullet(password)
 
 
 def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None):
@@ -100,46 +112,41 @@ def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
-@main.group(help="Push something.")
+@main.command(help="Push something.")
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
-@click.pass_context
-def push(ctx, title, device, channel):
+@click.option("-f", "--file", "--filename", is_flag=True, help="The given argument is a name file to push")
+@click.option("-u", "--link", is_flag=True, help="The given argument URL")
+@click.argument('arg', default=None, required=False)
+def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
-        click.echo("Please specify either device, channel or non of them.")
-        ctx.exit()
+        raise click.ClickException("--channel and --device cannot be used together")
 
+    kwargs = {
+        'title': title,
+        'device': device,
+        'channel': channel,
+    }
+    if filename and link:
+        raise click.ClickException("--file and --link cannot be used together")
+    elif filename:
+        kwargs['file_path'] = arg
+        kwargs['data_type'] = 'file'
+    elif link:
+        kwargs['message'] = arg
+        kwargs['data_type'] = 'url'
+    else:
+        if arg is None:
+            print("Enter your message: ")
+            arg = sys.stdin.read()
 
-@push.command()
-@click.argument('source', type=click.Path(exists=True))
-@click.pass_context
-def file(ctx, source):
-    kwargs = dict(ctx.parent.params)
-    kwargs['file_path'] = click.format_filename(source)
-    kwargs['data_type'] = 'file'
+        kwargs['message'] = arg
+        kwargs['data_type'] = 'text'
+
     _push(**kwargs)
 
 
-@push.command()
-@click.argument('message', default=None, required=False)
-@click.pass_context
-def text(ctx, message):
-    if message is None:
-        print("Enter your message: ")
-        message = sys.stdin.read()
-
-    kwargs = dict(ctx.parent.params)
-    kwargs['message'] = message
-    kwargs['data_type'] = 'text'
-    _push(**kwargs)
-
-
-@push.command()
-@click.argument('url')
-@click.pass_context
-def link(ctx, url):
-    kwargs = dict(ctx.parent.params)
-    kwargs['message'] = url
-    kwargs['data_type'] = 'url'
-    _push(**kwargs)
+@main.command(help="Print version number.")
+def version():
+    print("PushBullet CLI, version " + __version__)
