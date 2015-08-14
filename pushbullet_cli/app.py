@@ -67,7 +67,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
         data.update(file_data)
 
     if channel is not None:
-        pb = channel
+        pb = pushbullet.channel.Channel(pb, {'tag': channel })
 
     if data_type == "file":
         pb.push_file(**data)
