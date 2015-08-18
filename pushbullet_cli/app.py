@@ -94,6 +94,16 @@ def purge():
             pb.delete_push(current_push['iden'])
 
 
+@main.command("dismiss", help="Mark all your pushes as read")
+def dismiss():
+    pb = _get_pb()
+
+    pushes = pb.get_pushes()
+    for current_push in pushes[1]:
+        if current_push['active'] and not current_push['dismissed']:
+            pb.dismiss_push(current_push['iden'])
+
+
 @main.command("list-devices", help="List your devices")
 def list_devices():
     pb = _get_pb()
