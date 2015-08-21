@@ -67,7 +67,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
         data.update(file_data)
 
     if channel is not None:
-        pb = channel
+        pb = pushbullet.channel.Channel(pb, {'tag': channel })
 
     if data_type == "file":
         pb.push_file(**data)
@@ -81,7 +81,9 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
 
 @click.group()
 def main():
-    pass
+    # The pycrypto encrypted keyring asks for a password in every launch. This is unacceptable.
+    if isinstance(keyring.get_keyring(), keyring.backends.file.EncryptedKeyring):
+        keyring.set_keyring(keyring.backends.file.PlaintextKeyring())
 
 
 @main.command("purge", help="Delete all your pushes.")
