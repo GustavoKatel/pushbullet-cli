@@ -25,7 +25,7 @@ class NoApiKey(click.ClickException):
     exit_code = 1
 
     def __init__(self):
-        msg = ("No API key was specified. Either run pb set_key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
+        msg = ("No API key was specified. Either run pb set-key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
                "You can find your key at <https://www.pushbullet.com/account>.")
         super(NoApiKey, self).__init__(msg)
 
