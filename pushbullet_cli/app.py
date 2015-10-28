@@ -14,7 +14,8 @@ from .__version__ import __version__
 def _decode(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        return f(*args, **kwargs).decode("ASCII")
+        file_type = f(*args, **kwargs)
+        return None if file_type is None else file_type.decode("ASCII")
 
     return wrapper
 
@@ -25,7 +26,7 @@ class NoApiKey(click.ClickException):
     exit_code = 1
 
     def __init__(self):
-        msg = ("No API key was specified. Either run pb set_key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
+        msg = ("No API key was specified. Either run pb set-key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
                "You can find your key at <https://www.pushbullet.com/account>.")
         super(NoApiKey, self).__init__(msg)
 
@@ -67,7 +68,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
         data.update(file_data)
 
     if channel is not None:
-        pb = channel
+        pb = pushbullet.channel.Channel(pb, {'tag': channel })
 
     if data_type == "file":
         pb.push_file(**data)
@@ -81,7 +82,9 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
 
 @click.group()
 def main():
-    pass
+    # The pycrypto encrypted keyring asks for a password in every launch. This is unacceptable.
+    if isinstance(keyring.get_keyring(), keyring.backends.file.EncryptedKeyring):
+        keyring.set_keyring(keyring.backends.file.PlaintextKeyring())
 
 
 @main.command("purge", help="Delete all your pushes.")
@@ -89,7 +92,7 @@ def purge():
     pb = _get_pb()
 
     pushes = pb.get_pushes()
-    for current_push in pushes[1]:
+    for current_push in pushes:
         if current_push['active']:
             pb.delete_push(current_push['iden'])
 
