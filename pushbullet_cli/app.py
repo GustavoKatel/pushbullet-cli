@@ -92,7 +92,7 @@ def purge():
     pb = _get_pb()
 
     pushes = pb.get_pushes()
-    for current_push in pushes[1]:
+    for current_push in pushes:
         if current_push['active']:
             pb.delete_push(current_push['iden'])
 
