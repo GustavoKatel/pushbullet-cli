@@ -14,7 +14,8 @@ from .__version__ import __version__
 def _decode(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        return f(*args, **kwargs).decode("ASCII")
+        file_type = f(*args, **kwargs)
+        return None if file_type is None else file_type.decode("ASCII")
 
     return wrapper
 
