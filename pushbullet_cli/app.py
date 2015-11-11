@@ -7,19 +7,7 @@ import os.path
 import keyring
 import pushbullet
 import sys
-from functools import wraps
 from .__version__ import __version__
-
-
-def _decode(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        file_type = f(*args, **kwargs)
-        return None if file_type is None else file_type.decode("ASCII")
-
-    return wrapper
-
-pushbullet.pushbullet.get_file_type = _decode(pushbullet.pushbullet.get_file_type)
 
 
 class NoApiKey(click.ClickException):
@@ -90,11 +78,7 @@ def main():
 @main.command("purge", help="Delete all your pushes.")
 def purge():
     pb = _get_pb()
-
-    pushes = pb.get_pushes()
-    for current_push in pushes:
-        if current_push['active']:
-            pb.delete_push(current_push['iden'])
+    pb.delete_pushes()
 
 
 @main.command("dismiss", help="Mark all your pushes as read")
