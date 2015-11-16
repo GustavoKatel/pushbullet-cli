@@ -85,10 +85,9 @@ def purge():
 def dismiss():
     pb = _get_pb()
 
-    pushes = pb.get_pushes()
-    for current_push in pushes[1]:
-        if current_push['active'] and not current_push['dismissed']:
-            pb.dismiss_push(current_push['iden'])
+    pushes = pb.get_pushes(filter_inactive=True)
+    for current_push in pushes:
+        pb.dismiss_push(current_push['iden'])
 
 
 @main.command("list-devices", help="List your devices")
