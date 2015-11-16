@@ -108,6 +108,25 @@ def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
+@main.command("sms", help="Send an SMS")
+@click.option("-d", "--device", type=int, default=None, required=True, help="Device index to send SMS from. Use pb list-devices to get the indices")
+@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to")
+@click.argument('message', default=None, required=False)
+def sms(device, number, message):
+    pb = _get_pb()
+    try:
+        device = pb.devices[device]
+    except IndexError:
+        raise InvalidDevice(device, pb.devices)
+
+    kwargs = {
+            'device': device,
+            'number': number,
+            'message': message
+    }
+    pb.push_sms(**kwargs)
+
+
 @main.command(help="Push something.")
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")

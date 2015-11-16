@@ -34,3 +34,7 @@ Push files:
 Push to all subscribers of channel:
 
     $ pb push -c "CHANNEL" "Why burritos are better than tacos"
+
+Send an SMS:
+
+    $ pb sms -d 0 -n +123456789 "I sense a soul in search of answers"
