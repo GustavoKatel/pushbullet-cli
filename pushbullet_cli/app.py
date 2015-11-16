@@ -111,14 +111,14 @@ def delete_key():
 @main.command("sms", help="Send an SMS")
 @click.option("-d", "--device", type=int, default=None, required=True, help="Device index to send SMS from. Use pb list-devices to get the indices")
 @click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to")
-@click.option("-m", "--message", type=str, default=None, required=True, help="The message to send")
+@click.argument('message', default=None, required=False)
 def sms(device, number, message):
     pb = _get_pb()
     try:
         device = pb.devices[device]
     except IndexError:
         raise InvalidDevice(device, pb.devices)
-                                                
+
     kwargs = {
             'device': device,
             'number': number,
