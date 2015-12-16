@@ -94,7 +94,7 @@ def dismiss():
 def list_devices():
     pb = _get_pb()
     for i, device in enumerate(pb.devices):
-        print("{0}. {1}".format(i, device.nickname))
+        print(u"{0}. {1}".format(i, device.nickname))
 
 
 @main.command("set-key", help="Set your API key.")
