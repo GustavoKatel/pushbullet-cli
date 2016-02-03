@@ -71,9 +71,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
 
 @click.group()
 def main():
-    # The pycrypto encrypted keyring asks for a password in every launch. This is unacceptable.
-    if isinstance(keyring.get_keyring(), keyring.backends.file.EncryptedKeyring):
-        keyring.set_keyring(keyring.backends.file.PlaintextKeyring())
+    pass
 
 
 @main.command("purge", help="Delete all your pushes.")
