@@ -40,10 +40,10 @@ def _get_pb():
     return pushbullet.PushBullet(password)
 
 
-def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None):
+def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None, url=None):
     pb = _get_pb()
 
-    data = {}
+    data = {"body": message}
     if device is not None:
         try:
             pb = pb.devices[device]
@@ -58,14 +58,14 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
         data.update(file_data)
 
     if channel is not None:
-        pb = pushbullet.channel.Channel(pb, {'tag': channel })
+        pb = pushbullet.channel.Channel(pb, {'tag': channel})
 
     if data_type == "file":
         pb.push_file(**data)
     elif data_type == "url":
-        pb.push_link(title=title or message, url=message, **data)
+        pb.push_link(title=title or url, url=url, **data)
     elif data_type == "text":
-        pb.push_note(title=title or "Note", body=message, **data)
+        pb.push_note(title=title or "Note", **data)
     else:
         raise Exception("Unknown data type")
 
@@ -133,8 +133,8 @@ def sms(device, number, message):
 @click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
-@click.option("-f", "--file", "--filename", is_flag=True, help="The given argument is a name file to push")
-@click.option("-u", "--link", is_flag=True, help="The given argument URL")
+@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push")
+@click.option("-u", "--link", default=None, help="The given argument URL")
 @click.argument('arg', default=None, required=False)
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
@@ -144,21 +144,23 @@ def push(title, device, channel, filename, link, arg):
         'title': title,
         'device': device,
         'channel': channel,
+        'message': arg
     }
+
     if filename and link:
         raise click.ClickException("--file and --link cannot be used together")
+
     elif filename:
-        kwargs['file_path'] = arg
+        kwargs['file_path'] = filename
         kwargs['data_type'] = 'file'
     elif link:
-        kwargs['message'] = arg
+        kwargs['url'] = link
         kwargs['data_type'] = 'url'
     else:
         if arg is None:
             print("Enter your message: ")
             arg = sys.stdin.read()
 
-        kwargs['message'] = arg
         kwargs['data_type'] = 'text'
 
     _push(**kwargs)
