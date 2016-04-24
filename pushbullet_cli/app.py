@@ -159,7 +159,7 @@ def push(title, device, channel, filename, link, arg):
     else:
         if arg is None:
             print("Enter your message: ")
-            arg = sys.stdin.read()
+            kwargs['message'] = sys.stdin.read()
 
         kwargs['data_type'] = 'text'
 
