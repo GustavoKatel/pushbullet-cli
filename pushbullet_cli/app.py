@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import click
 import getpass
+import datetime
 import os
 import os.path
 import keyring
@@ -128,6 +129,38 @@ def sms(device, number, message):
         'message': message
     }
     pb.push_sms(**kwargs)
+
+
+def _format_push(p):
+    s = "Created:\t{}\n".format(datetime.datetime.fromtimestamp(p['created']).strftime("%x %X"))
+
+    s += "Sender:\t\t{}".format(p['sender_name'])
+    if 'sender_email' in p:
+        s += " ({})".format(p['sender_email'])
+    s += "\n"
+
+    if p['type'] == 'file':
+        s += "Filetype:\t{}\n".format(p['file_type'])
+        s += "Filename:\t{}\n".format(p['file_name'])
+        s += "Link:\t\t{}\n".format(p['file_url'])
+    else:
+        if 'title' in p:
+            s += "Title:\t\t{}\n".format(p['title'])
+        if 'url' in p:
+            s += "Link:\t\t{}\n".format(p['url'])
+        if 'body' in p:
+            s += "\n{}\n".format(p['body'].rstrip())
+
+    return s.rstrip()
+
+
+@main.command("list", help="List your pushes.")
+@click.option("-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
+def list_pushes(count):
+    pb = _get_pb()
+
+    pushes = pb.get_pushes(limit=count)
+    print(("\n" + "-" * 50 + "\n").join(_format_push(p) for p in pushes))
 
 
 @main.command(help="Push something.")
