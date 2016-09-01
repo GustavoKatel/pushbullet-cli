@@ -122,9 +122,9 @@ def sms(device, number, message):
         raise InvalidDevice(device, pb.devices)
 
     kwargs = {
-            'device': device,
-            'number': number,
-            'message': message
+        'device': device,
+        'number': number,
+        'message': message
     }
     pb.push_sms(**kwargs)
 
