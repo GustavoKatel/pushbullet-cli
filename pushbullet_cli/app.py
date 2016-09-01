@@ -83,7 +83,7 @@ def purge():
     pb.delete_pushes()
 
 
-@main.command("dismiss", help="Mark all your pushes as read")
+@main.command("dismiss", help="Mark all your pushes as read.")
 def dismiss():
     pb = _get_pb()
 
@@ -92,7 +92,7 @@ def dismiss():
         pb.dismiss_push(current_push['iden'])
 
 
-@main.command("list-devices", help="List your devices")
+@main.command("list-devices", help="List your devices.")
 def list_devices():
     pb = _get_pb()
     for i, device in enumerate(pb.devices):
@@ -105,12 +105,12 @@ def set_key():
     keyring.set_password("pushbullet", "cli", key)
 
 
-@main.command("delete-key", help="Remove your API key from the system keyring")
+@main.command("delete-key", help="Remove your API key from the system keyring.")
 def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
-@main.command("sms", help="Send an SMS")
+@main.command("sms", help="Send an SMS.")
 @click.option("-d", "--device", type=int, default=None, required=True, help="Device index to send SMS from. Use pb list-devices to get the indices")
 @click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to")
 @click.argument('message', default=None, required=False)
