@@ -111,8 +111,9 @@ def delete_key():
 
 
 @main.command("sms", help="Send an SMS.")
-@click.option("-d", "--device", type=int, default=None, required=True, help="Device index to send SMS from. Use pb list-devices to get the indices")
-@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to")
+@click.option("-d", "--device", type=int, default=None, required=True,
+              help="Device index to send SMS from. Use pb list-devices to get the indices.")
+@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to.")
 @click.argument('message', default=None, required=False)
 def sms(device, number, message):
     pb = _get_pb()
@@ -130,11 +131,12 @@ def sms(device, number, message):
 
 
 @main.command(help="Push something.")
-@click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
+@click.option("-d", "--device", type=int, default=None,
+              help="Device index to push to. Use pb list-devices to get the indices.")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
-@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push")
-@click.option("-u", "--link", default=None, help="The given argument URL")
+@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push.")
+@click.option("-u", "--link", default=None, help="The given argument URL.")
 @click.argument('arg', default=None, required=False)
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
