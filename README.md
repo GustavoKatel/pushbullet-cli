@@ -42,3 +42,16 @@ Send an SMS:
 List you pushes:
 
     $ pb list -c 20
+
+## Changelog
+
+- 0.7.6
+  - List previous pushes (#35)
+  - Avoid prompt the user when message is piped (#34)
+  - Removes default title (`Note`) (#36)
+
+## Contribution
+
+Many thanks to the original author @r-darwish
+
+Pull requests are welcome
