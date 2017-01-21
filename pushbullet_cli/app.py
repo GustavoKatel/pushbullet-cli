@@ -66,7 +66,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
     elif data_type == "url":
         pb.push_link(title=title or url, url=url, **data)
     elif data_type == "text":
-        pb.push_note(title=title if title is not None else "Note", **data)
+        pb.push_note(title=title if title is not None else "", **data)
     else:
         raise Exception("Unknown data type")
 
