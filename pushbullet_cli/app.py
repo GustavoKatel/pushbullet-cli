@@ -193,7 +193,8 @@ def push(title, device, channel, filename, link, arg):
         kwargs['data_type'] = 'url'
     else:
         if arg is None:
-            print("Enter your message: ")
+            if sys.stdin.isatty():
+                print("Enter your message: ")
             kwargs['message'] = sys.stdin.read()
 
         kwargs['data_type'] = 'text'
