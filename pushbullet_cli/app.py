@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import click
 import getpass
+import datetime
 import os
 import os.path
 import keyring
@@ -83,7 +84,7 @@ def purge():
     pb.delete_pushes()
 
 
-@main.command("dismiss", help="Mark all your pushes as read")
+@main.command("dismiss", help="Mark all your pushes as read.")
 def dismiss():
     pb = _get_pb()
 
@@ -92,7 +93,7 @@ def dismiss():
         pb.dismiss_push(current_push['iden'])
 
 
-@main.command("list-devices", help="List your devices")
+@main.command("list-devices", help="List your devices.")
 def list_devices():
     pb = _get_pb()
     for i, device in enumerate(pb.devices):
@@ -105,14 +106,15 @@ def set_key():
     keyring.set_password("pushbullet", "cli", key)
 
 
-@main.command("delete-key", help="Remove your API key from the system keyring")
+@main.command("delete-key", help="Remove your API key from the system keyring.")
 def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
-@main.command("sms", help="Send an SMS")
-@click.option("-d", "--device", type=int, default=None, required=True, help="Device index to send SMS from. Use pb list-devices to get the indices")
-@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to")
+@main.command("sms", help="Send an SMS.")
+@click.option("-d", "--device", type=int, default=None, required=True,
+              help="Device index to send SMS from. Use pb list-devices to get the indices.")
+@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to.")
 @click.argument('message', default=None, required=False)
 def sms(device, number, message):
     pb = _get_pb()
@@ -122,19 +124,52 @@ def sms(device, number, message):
         raise InvalidDevice(device, pb.devices)
 
     kwargs = {
-            'device': device,
-            'number': number,
-            'message': message
+        'device': device,
+        'number': number,
+        'message': message
     }
     pb.push_sms(**kwargs)
 
 
+def _format_push(p):
+    s = "Created:\t{}\n".format(datetime.datetime.fromtimestamp(p['created']).strftime("%x %X"))
+
+    s += "Sender:\t\t{}".format(p['sender_name'])
+    if 'sender_email' in p:
+        s += " ({})".format(p['sender_email'])
+    s += "\n"
+
+    if p['type'] == 'file':
+        s += "Filetype:\t{}\n".format(p['file_type'])
+        s += "Filename:\t{}\n".format(p['file_name'])
+        s += "Link:\t\t{}\n".format(p['file_url'])
+    else:
+        if 'title' in p:
+            s += "Title:\t\t{}\n".format(p['title'])
+        if 'url' in p:
+            s += "Link:\t\t{}\n".format(p['url'])
+        if 'body' in p:
+            s += "\n{}\n".format(p['body'].rstrip())
+
+    return s.rstrip()
+
+
+@main.command("list", help="List your pushes.")
+@click.option("-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
+def list_pushes(count):
+    pb = _get_pb()
+
+    pushes = pb.get_pushes(limit=count)
+    print(("\n" + "-" * 50 + "\n").join(_format_push(p) for p in pushes))
+
+
 @main.command(help="Push something.")
-@click.option("-d", "--device", type=int, default=None, help="Device index to push to. Use pb list-devices to get the indices")
+@click.option("-d", "--device", type=int, default=None,
+              help="Device index to push to. Use pb list-devices to get the indices.")
 @click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
-@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push")
-@click.option("-u", "--link", default=None, help="The given argument URL")
+@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push.")
+@click.option("-u", "--link", default=None, help="The given argument URL.")
 @click.argument('arg', default=None, required=False)
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
