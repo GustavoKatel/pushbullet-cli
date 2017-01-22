@@ -1,6 +1,12 @@
 Pushbullet CLI interface
 ========================
 
+## Installation
+
+    $ pip install pushbullet-cli 
+
+## Usage
+
 Use [Pushbullet](https://www.pushbullet.com/) from the command line.
 
 First of all, set your API key by running:
