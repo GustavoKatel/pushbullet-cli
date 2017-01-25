@@ -1,9 +1,12 @@
 Pushbullet CLI interface
 ========================
 
+[![PyPI](https://img.shields.io/pypi/v/pushbullet-cli.svg)](https://pypi.python.org/pypi/pushbullet-cli)
+[![license](https://img.shields.io/github/license/GustavoKatel/pushbullet-cli.svg)]()
+
 ## Installation
 
-    $ pip install pushbullet-cli 
+    $ pip install pushbullet-cli
 
 ## Usage
 
