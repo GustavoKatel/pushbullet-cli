@@ -12,7 +12,6 @@ import pushbullet
 import sys
 from .__version__ import __version__
 
-
 class NoApiKey(click.ClickException):
     exit_code = 1
 
@@ -174,6 +173,10 @@ def list_pushes(count):
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
         raise click.ClickException("--channel and --device cannot be used together")
+
+    if not arg and not sys.stdin.isatty():
+        # If we didn't provide an argument BUT stdin seems to be a pipe, read that.
+        arg = sys.stdin.read()
 
     kwargs = {
         'title': title,
