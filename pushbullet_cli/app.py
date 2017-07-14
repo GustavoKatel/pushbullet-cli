@@ -12,6 +12,7 @@ import pushbullet
 import sys
 from .__version__ import __version__
 
+
 class NoApiKey(click.ClickException):
     exit_code = 1
 
