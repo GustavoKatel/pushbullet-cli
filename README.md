@@ -48,10 +48,18 @@ Send an SMS:
 
     $ pb sms -d 0 -n +123456789 "I sense a soul in search of answers"
 
-List you pushes:
+List your pushes:
 
     $ pb list -c 20
 
+To set the API key from within python:
+
+    import keyring, keyrings.alt
+    if isinstance(keyring.get_keyring(), keyrings.alt.file.EncryptedKeyring):
+        keyring.set_keyring(keyrings.alt.file.PlaintextKeyring())
+    keyring.set_password("pushbullet", "cli", PUSHBULLET_KEY)
+
+    
 ## Changelog
 
 - 0.7.6
