@@ -3,19 +3,13 @@ from setuptools import setup, find_packages
 import functools
 import os
 
-_in_same_dir = functools.partial(os.path.join, os.path.dirname(__file__))
-
-with open(_in_same_dir("pushbullet_cli", "__version__.py")) as version_file:
-    exec(version_file.read())  # pylint: disable=W0122
-
-
 setup(
     name="pushbullet-cli",
     description='Command line tool for controlling PushBullet',
     author='Roey Darwish Dror',
     author_email='roey.ghost@gmail.com',
     url='https://github.com/GustavoKatel/pushbullet-cli',
-    version=__version__,
+    version='0.7.6',
     packages=find_packages(exclude=['tests']),
     install_requires=['pushbullet.py >= 0.9.0', 'click', 'keyring>=8.2', 'keyrings.alt'],
     entry_points={
