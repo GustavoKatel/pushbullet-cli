@@ -118,7 +118,7 @@ guidelines <https://github.com/GustavoKatel/pushbullet-cli/blob/master/CONTRIBUT
 .. |Build Status| image:: https://travis-ci.com/GustavoKatel/pushbullet-cli.svg?branch=master
    :target: https://travis-ci.com/GustavoKatel/pushbullet-cli
 
-.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/cgwa2lgmglplp6jd?svg=true
+.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/cgwa2lgmglplp6jd/branch/master?svg=true
    :target: https://ci.appveyor.com/project/GustavoKatel/pushbullet-cli
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/GustavoKatel/pushbullet-cli.svg
