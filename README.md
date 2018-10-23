@@ -64,6 +64,13 @@ To set the API key from within python:
 
 ## Changelog
 
+- 0.8 (WIP)
+  - Remove Python 2.7 support ([Countdown](https://pythonclock.org/))
+  - Support to Click 7.0
+  - Add test cases
+  - Add travis build
+  - Add coverage report
+
 - 0.7.6
   - List previous pushes (#35)
   - Avoid prompt the user when message is piped (#34)
@@ -74,3 +81,5 @@ To set the API key from within python:
 Many thanks to the original author @r-darwish
 
 Pull requests are welcome
+
+Take a look at the [Contributing guidelines](https://github.com/GustavoKatel/pushbullet-cli/blob/master/CONTRIBUTING.rst)

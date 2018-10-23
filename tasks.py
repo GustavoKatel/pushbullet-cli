@@ -5,6 +5,17 @@ from invoke import task
 
 
 @task
+def test(ctx, nocov=False):
+    import pytest
+    args = ['tests']
+
+    if not nocov:
+        args.append('--cov=pushbullet_cli')
+
+    pytest.main(args)
+
+
+@task
 def format(ctx, noimports=False, nostyle=False):
     if not noimports:
         from isort import SortImports
