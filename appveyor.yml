@@ -1,0 +1,19 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python35"
+
+    - PYTHON: "C:\\Python36"
+
+    - PYTHON: "C:\\Python37"
+
+install:
+  - "%PYTHON%/python.exe -m pip install -U pip"
+  - "%PYTHON%/python.exe -m pip install -U pipenv"
+
+build: false
+
+test_script:
+  - "%PYTHON%/Scripts/pipenv install --dev"
+  - "%PYTHON%/Scripts/pipenv run pytest"
+
+skip_tags: true
