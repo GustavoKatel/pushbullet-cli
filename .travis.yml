@@ -25,18 +25,6 @@ matrix:
       language: generic
       env: PYTHON=3.7.0
 
-    - os: windows
-      language: generic
-      env: PYTHON=3.5
-
-    - os: windows
-      language: generic
-      env: PYTHON=3.6
-
-    - os: windows
-      language: generic
-      env: PYTHON=3.7
-
 before_install: |
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew update
