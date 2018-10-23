@@ -15,12 +15,7 @@ setup(
     version='0.7.6',
     packages=find_packages(exclude=['tests']),
     install_requires=[
-        'pushbullet.py >= 0.11.0',
-        'click',
-        'keyring>=15.1.0',
-        'keyrings.alt'
+        'pushbullet.py >= 0.11.0', 'click', 'keyring>=15.1.0', 'keyrings.alt'
     ],
-    entry_points={
-        'console_scripts': ['pb = pushbullet_cli.app:main']
-    },
+    entry_points={'console_scripts': ['pb = pushbullet_cli.app:main']},
 )
