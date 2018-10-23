@@ -6,9 +6,14 @@ import os
 
 from setuptools import find_packages, setup
 
+def readme():
+    with open('README.rst') as f:
+        return f.read()
+
 setup(
     name="pushbullet-cli",
     description='Command line tool for controlling PushBullet',
+    long_description=readme(),
     author='Gustavo Sampaio',
     author_email='gbritosampaio@gmail.com',
     url='https://github.com/GustavoKatel/pushbullet-cli',
