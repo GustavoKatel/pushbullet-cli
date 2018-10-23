@@ -6,7 +6,8 @@ import pytest
 def test_set_key(set_key, pb_api, mocker):
     import keyring
     import getpass
-    prev_token = keyring.get_password("pushbullet", "cli")
+    import six
+    prev_token = six.text_type(keyring.get_password("pushbullet", "cli"))
     try:
         with mocker.patch.object(getpass, 'getpass', return_value='abc'):
             set_key()
