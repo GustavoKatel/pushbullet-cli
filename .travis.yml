@@ -1,0 +1,21 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7-dev"  # 3.7 development branch
+install:
+  - pip install pipenv
+  - pipenv install --dev
+script:
+  - pipenv run pytest --cov=pushbullet_cli
+deploy:
+  provider: pypi
+  user: GustavoKatel
+  password:
+    secure: V8r7yhJ+utgWStp0/LHlPI6qvNekgI1c/SlIooD4LKoFBmLIMJR0EvblAazT0h6Wj3tE0B0ZyzySUHwDxgt+zXbWyQb4pcZ2PxFpPYTBqk0TxxuVLMRpMIs4y5RSGpFXyN6qEaJ9MCYhlGc9on9R5D5trlIlJxLsOVUh8YPL8v2sc+krLl2DAe48VupkttVnie5jjXDG11U8WH/lOixVgQO9qxSxowHoOc50tkzGyi8GrPS0c91jl+T/BA5J1qOsbQSWrvAXKzbay/GLidjjiAoNImSpHRhMRcBc4mSnXZaeNa9EtJS1RHp2WwA8Bs7ubXPgLK243dw8dHoOOngDvjg1qd1VqP+q+PcT3VOGR8zyIi9s5ObIygu57BPAEHQLYAdf4PjwaAPJF5YH4CwX27cZuG9xJc8gzbIc0j2A4K6K9jFIRNgj53rmRdMS3qEB1v6VWb/P2DComcK3uUlXtwHVgYPmdLRDp1JuVRn+9HXW/uEzi7dMQuDQtLNpl0ku6RECzugb0qpba8s/KTiVgIYzyMbcS4LlBfSmHG8udQo0lSXe2lvYxniFOUi016lWhJ/K8spJMZ/1dE6Nu/MoWv7tob6YdWXwzLAaWIIuKxZOrwq9ZCR3zJzECV4+lNuQSleOZCwJkBCycha+PD7qw3+S0vEVuqe8cmXEDYtBXdA=
+  on:
+    tags: true
