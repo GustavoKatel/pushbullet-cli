@@ -2,6 +2,7 @@ Pushbullet CLI interface
 ========================
 
 [![Build Status](https://travis-ci.com/GustavoKatel/pushbullet-cli.svg?branch=master)](https://travis-ci.com/GustavoKatel/pushbullet-cli)
+[![Codecov](https://img.shields.io/codecov/c/github/GustavoKatel/pushbullet-cli.svg)](https://codecov.io/gh/GustavoKatel/pushbullet-cli)
 [![PyPI](https://img.shields.io/pypi/v/pushbullet-cli.svg)](https://pypi.python.org/pypi/pushbullet-cli)
 [![license](https://img.shields.io/github/license/GustavoKatel/pushbullet-cli.svg)]()
 
