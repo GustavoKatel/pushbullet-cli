@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+click = "*"
+pushbullet-py = ">=0.11.0"
+keyring = ">=15.1.0"
+keyrings-alt = "*"
+
+[dev-packages]
+bumpversion = "*"
+pytest = "*"
+pytest-xdist = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-regressions = "*"
+yapf = "*"
+isort = "*"

@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
-import click
-import getpass
 import datetime
+import getpass
 import os
 import os.path
+import sys
+
+import click
 import keyring
 import keyrings.alt
 import pushbullet
-import sys
+
 from .__version__ import __version__
 
 
@@ -17,8 +19,9 @@ class NoApiKey(click.ClickException):
     exit_code = 1
 
     def __init__(self):
-        msg = ("No API key was specified. Either run pb set-key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
-               "You can find your key at <https://www.pushbullet.com/account>.")
+        msg = (
+            "No API key was specified. Either run pb set-key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
+            "You can find your key at <https://www.pushbullet.com/account>.")
         super(NoApiKey, self).__init__(msg)
 
 
@@ -26,8 +29,11 @@ class InvalidDevice(click.ClickException):
     exit_code = 1
 
     def __init__(self, index, devices):
-        super(InvalidDevice, self).__init__("Invalid device number {0}. Choose one of the following devices:\n{1}".format(
-            index, "\n".join("{0}. {1}".format(i, device.nickname) for i, device in enumerate(devices))))
+        super(InvalidDevice, self).__init__(
+            "Invalid device number {0}. Choose one of the following devices:\n{1}"
+            .format(
+                index, "\n".join("{0}. {1}".format(i, device.nickname)
+                                 for i, device in enumerate(devices))))
 
 
 def _get_pb():
@@ -41,7 +47,13 @@ def _get_pb():
     return pushbullet.PushBullet(password)
 
 
-def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None, url=None):
+def _push(data_type,
+          title=None,
+          message=None,
+          channel=None,
+          device=None,
+          file_path=None,
+          url=None):
     pb = _get_pb()
 
     data = {"body": message}
@@ -102,19 +114,33 @@ def list_devices():
 
 @main.command("set-key", help="Set your API key.")
 def set_key():
-    key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
+    key = getpass.getpass(
+        "Enter your security token from https://www.pushbullet.com/account: ")
     keyring.set_password("pushbullet", "cli", key)
 
 
-@main.command("delete-key", help="Remove your API key from the system keyring.")
+@main.command(
+    "delete-key", help="Remove your API key from the system keyring.")
 def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
 
 @main.command("sms", help="Send an SMS.")
-@click.option("-d", "--device", type=int, default=None, required=True,
-              help="Device index to send SMS from. Use pb list-devices to get the indices.")
-@click.option("-n", "--number", type=str, default=None, required=True, help="The phone number to send the SMS to.")
+@click.option(
+    "-d",
+    "--device",
+    type=int,
+    default=None,
+    required=True,
+    help="Device index to send SMS from. Use pb list-devices to get the indices."
+)
+@click.option(
+    "-n",
+    "--number",
+    type=str,
+    default=None,
+    required=True,
+    help="The phone number to send the SMS to.")
 @click.argument('message', default=None, required=False)
 def sms(device, number, message):
     pb = _get_pb()
@@ -123,16 +149,13 @@ def sms(device, number, message):
     except IndexError:
         raise InvalidDevice(device, pb.devices)
 
-    kwargs = {
-        'device': device,
-        'number': number,
-        'message': message
-    }
+    kwargs = {'device': device, 'number': number, 'message': message}
     pb.push_sms(**kwargs)
 
 
 def _format_push(p):
-    s = "Created:\t{}\n".format(datetime.datetime.fromtimestamp(p['created']).strftime("%x %X"))
+    s = "Created:\t{}\n".format(
+        datetime.datetime.fromtimestamp(p['created']).strftime("%x %X"))
 
     s += "Sender:\t\t{}".format(p['sender_name'])
     if 'sender_email' in p:
@@ -155,7 +178,8 @@ def _format_push(p):
 
 
 @main.command("list", help="List your pushes.")
-@click.option("-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
+@click.option(
+    "-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
 def list_pushes(count):
     pb = _get_pb()
 
@@ -164,16 +188,27 @@ def list_pushes(count):
 
 
 @main.command(help="Push something.")
-@click.option("-d", "--device", type=int, default=None,
-              help="Device index to push to. Use pb list-devices to get the indices.")
-@click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
+@click.option(
+    "-d",
+    "--device",
+    type=int,
+    default=None,
+    help="Device index to push to. Use pb list-devices to get the indices.")
+@click.option(
+    "-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
-@click.option("-f", "--file", "--filename", default=None, help="The given argument is a name file to push.")
+@click.option(
+    "-f",
+    "--file",
+    "filename",
+    default=None,
+    help="The given argument is a name file to push.")
 @click.option("-u", "--link", default=None, help="The given argument URL.")
 @click.argument('arg', default=None, required=False)
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
-        raise click.ClickException("--channel and --device cannot be used together")
+        raise click.ClickException(
+            "--channel and --device cannot be used together")
 
     kwargs = {
         'title': title,
