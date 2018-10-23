@@ -1,6 +1,7 @@
 Pushbullet CLI interface
 ========================
 
+[![Build Status](https://travis-ci.com/GustavoKatel/pushbullet-cli.svg?branch=master)](https://travis-ci.com/GustavoKatel/pushbullet-cli)
 [![PyPI](https://img.shields.io/pypi/v/pushbullet-cli.svg)](https://pypi.python.org/pypi/pushbullet-cli)
 [![license](https://img.shields.io/github/license/GustavoKatel/pushbullet-cli.svg)]()
 
@@ -59,7 +60,7 @@ To set the API key from within python:
         keyring.set_keyring(keyrings.alt.file.PlaintextKeyring())
     keyring.set_password("pushbullet", "cli", PUSHBULLET_KEY)
 
-    
+
 ## Changelog
 
 - 0.7.6
