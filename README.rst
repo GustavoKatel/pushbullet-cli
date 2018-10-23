@@ -1,7 +1,7 @@
 Pushbullet CLI interface
 ========================
 
-|Build Status| |Codecov| |PyPI| |license|
+|Build Status| |Windows Build Status| |Codecov| |PyPI| |license|
 
 Installation
 ------------
@@ -117,9 +117,15 @@ guidelines <https://github.com/GustavoKatel/pushbullet-cli/blob/master/CONTRIBUT
 
 .. |Build Status| image:: https://travis-ci.com/GustavoKatel/pushbullet-cli.svg?branch=master
    :target: https://travis-ci.com/GustavoKatel/pushbullet-cli
+
+.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/cgwa2lgmglplp6jd/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/GustavoKatel/pushbullet-cli
+
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/GustavoKatel/pushbullet-cli.svg
    :target: https://codecov.io/gh/GustavoKatel/pushbullet-cli
+
 .. |PyPI| image:: https://img.shields.io/pypi/v/pushbullet-cli.svg
    :target: https://pypi.python.org/pypi/pushbullet-cli
+
 .. |license| image:: https://img.shields.io/github/license/GustavoKatel/pushbullet-cli.svg
    :target: https://img.shields.io/github/license/GustavoKatel/pushbullet-cli.svg
