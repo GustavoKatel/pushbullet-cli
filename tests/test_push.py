@@ -61,8 +61,8 @@ def test_push_link_with_title(push, pb_api):
         url=link, title='my title', body=None)
 
 
-def test_push_file(push, pb_api, tmp_path):
-    filename = tmp_path / 'burrito.txt'
-    filename.write_text('want some burrito?')
+def test_push_file(push, pb_api, tmpdir):
+    filename = tmpdir.join('burrito.txt')
+    filename.write('want some burrito?')
     push(['--file', str(filename)])
     pb_api.push_file.assert_called_once_with(body=None, filename='burrito.txt')
