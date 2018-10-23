@@ -1,5 +1,5 @@
 FROM python:3-alpine
-MAINTAINER roey.ghost@gmail.com
+MAINTAINER gbritosampaio@gmail.com
 
 ADD setup.py /opt/pushbullet-cli/setup.py
 ADD pushbullet_cli /opt/pushbullet-cli/pushbullet_cli
