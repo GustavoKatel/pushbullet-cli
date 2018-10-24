@@ -238,3 +238,34 @@ def push(title, device, channel, filename, link, arg):
 @main.command(help="Print version number.")
 def version():
     print("PushBullet CLI, version " + __version__)
+
+
+@main.command(help="Listen for pushes.")
+@click.option(
+    "-k",
+    "--forever",
+    is_flag=True,
+    help="If the lister should keep listening after receiving a push.")
+def listen(forever):
+    click.echo("Starting...", err=True)
+    pb = _get_pb()
+
+    def on_push(data):
+        click.echo("Received")
+        print(data)
+
+        if not forever:
+            sys.exit(0)
+
+    def on_error(*args, **kwargs):
+        print(args, kwargs)
+
+    server = pushbullet.Listener(
+        account=pb, on_push=on_push, on_error=on_error)
+    server.setDaemon(True)
+    try:
+        click.echo("Listening to pushes...", err=True)
+        server.run_forever()
+    except KeyboardInterrupt:
+        click.echo("Closing...", err=True)
+        server.close()
