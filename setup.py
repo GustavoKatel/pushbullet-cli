@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-from __future__ import print_function, unicode_literals
-
 import functools
 import os
 
 from setuptools import find_packages, setup
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
+
 
 setup(
     name="pushbullet-cli",
