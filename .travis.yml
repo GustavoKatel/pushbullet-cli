@@ -65,3 +65,9 @@ notifications:
   email:
     on_success: never
     on_failure: change
+  webhooks:
+    urls:
+      secure: C35gKaP63zrNdFCw9ln6Y095u92q9hnAsqEsR2JpD1/U+WM1fBlrX1oOilXGH3e8/aTB2tKiYN3AaDPcG2raneBtaoU2caDIwo1MUGbO4HlZBiH73WfWLyTUoaEyqr/Q1+A0WnlTS04w4hXxSrvtkq89BDDN0AMD8d1hu7Qv2y0=
+    on_success: always
+    on_failure: always
+    on_error: always
