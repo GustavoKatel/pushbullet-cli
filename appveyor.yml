@@ -17,3 +17,11 @@ test_script:
   - "%PYTHON%/Scripts/pipenv run pytest"
 
 skip_tags: true
+
+notifications:
+  - provider: Webhook
+    url:
+      secure: Td6i7vvha+1BdTEBf6UyXHyBGwRw29cnlS6KHL4M59QbVzJWBuV+Gyr1ypH6jnBFMNPHqLz+tVYmeGeFhAOPRA==
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
