@@ -14,7 +14,7 @@ build: false
 
 test_script:
   - "%PYTHON%/Scripts/pipenv install --dev"
-  - "%PYTHON%/Scripts/pipenv run pytest"
+  - "%PYTHON%/Scripts/pipenv run pytest tests"
 
 skip_tags: true
 
@@ -22,6 +22,6 @@ notifications:
   - provider: Webhook
     url:
       secure: Td6i7vvha+1BdTEBf6UyXHyBGwRw29cnlS6KHL4M59QbVzJWBuV+Gyr1ypH6jnBFMNPHqLz+tVYmeGeFhAOPRA==
-    on_build_success: false
+    on_build_success: true
     on_build_failure: true
     on_build_status_changed: true
