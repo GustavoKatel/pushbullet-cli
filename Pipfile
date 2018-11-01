@@ -1,15 +1,20 @@
 [[source]]
+
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
+
 click = "==7.0"
 pushbullet-py = "==0.11.0"
-keyring = "==15.2.0"
+keyring = "==16.0.0"
 keyrings-alt = "==3.1"
 
+
 [dev-packages]
+
 bumpversion = "*"
 pytest = "*"
 pytest-xdist = "*"
@@ -18,7 +23,7 @@ pytest-mock = "*"
 pytest-regressions = "*"
 yapf = "*"
 isort = "*"
-"pathlib2" = "*"
+pathlib2 = "*"
 codecov = "*"
 invoke = "*"
 pre-commit = "*"
