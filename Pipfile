@@ -16,7 +16,7 @@ keyrings-alt = "==3.1"
 [dev-packages]
 
 bumpversion = "==0.5.3"
-pytest = "*"
+pytest = "==3.9.3"
 pytest-xdist = "*"
 pytest-cov = "*"
 pytest-mock = "*"
