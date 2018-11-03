@@ -9,3 +9,6 @@
 .coverage
 tmp/
 .vscode
+
+# We are targeting multiple OS and python versions
+Pipfile.lock

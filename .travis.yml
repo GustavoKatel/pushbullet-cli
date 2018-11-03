@@ -1,5 +1,11 @@
 language: python
 
+branches:
+  only:
+    - master
+    - /^v\d+.\d+(.\d+)?(-\S*)?$/
+    - /^feat\/.*$/
+
 sudo: false
 
 matrix:
