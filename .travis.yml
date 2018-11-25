@@ -6,8 +6,6 @@ branches:
     - /^v\d+.\d+(.\d+)?(-\S*)?$/
     - /^feat\/.*$/
 
-sudo: false
-
 matrix:
   include:
     - os: linux
