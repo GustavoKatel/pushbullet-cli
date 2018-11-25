@@ -85,7 +85,7 @@ To set the API key from within python:
 Changelog
 ---------
 
-* 1.0.0
+* 1.0
 
   - Remove Python 2.7 support (`Countdown <https://pythonclock.org/>`__)
 

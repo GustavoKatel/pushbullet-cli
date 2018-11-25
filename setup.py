@@ -17,7 +17,7 @@ setup(
     author='Gustavo Sampaio',
     author_email='gbritosampaio@gmail.com',
     url='https://github.com/GustavoKatel/pushbullet-cli',
-    version='1.0.0',
+    version='1.0',
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'pushbullet.py~=0.11.0',
