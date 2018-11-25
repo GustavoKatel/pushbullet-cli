@@ -6,9 +6,12 @@
 *.swp
 .venv
 
+coverage.xml
 .coverage
 tmp/
 .vscode
+
+dist/
 
 # We are targeting multiple OS and python versions
 Pipfile.lock
