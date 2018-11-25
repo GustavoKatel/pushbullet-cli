@@ -17,13 +17,13 @@ setup(
     author='Gustavo Sampaio',
     author_email='gbritosampaio@gmail.com',
     url='https://github.com/GustavoKatel/pushbullet-cli',
-    version='0.7.6',
+    version='1.0.0',
     packages=find_packages(exclude=['tests']),
     install_requires=[
-        'pushbullet.py==0.11.0',
-        'click==7.0',
-        'keyring==16.0.2',
-        'keyrings.alt==3.1'
+        'pushbullet.py~=0.11.0',
+        'click~=7.0',
+        'keyring~=16.0.2',
+        'keyrings.alt~=3.1'
     ],
     entry_points={'console_scripts': ['pb = pushbullet_cli.app:main']},
 )
