@@ -52,6 +52,7 @@ deploy:
     secure: FEx5o0mkpFvEhwf1qWpScx5TZMjmsD0gC+RB9N3Ec0GJWLPGEBM1CV8fU54VdSlpjSS6Uaear9K+JP5wwinVbGfEwIbjElvXVH1jGb42NyU2XtitvXJTUgpPkIBZfAaYDgHzzs02Yt7/2F/CWpUrFzNkQgyrS9CynHr26+Bz0Uk=
   on:
     tags: true
+  skip_existing: true
 notifications:
   email:
     on_success: never
