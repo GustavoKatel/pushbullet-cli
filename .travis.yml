@@ -49,7 +49,7 @@ deploy:
   provider: pypi
   user: GustavoKatel
   password:
-    secure: RK/+QxpDoooEa37Ux2IYq8bbSnWtrHG+I1bkAgNiqh8XAxZVpH1ssx7upEy0kNLVw0U6H6nPTKlol8DQs4iQ7qXjYToKa+RZdT6hCb5tmGCWDn0f6rTaYwjcuZIiAv3tDJxgnKShAD1+F44KA5+vIT+u/swLjv0WHUnwyx+fgxo=
+    secure: FeKYEycd1FnT2hmrqVKjC1Mn4xAeDuIsYiQx5JcJ5zHPoLeWA3w1yEbVM7mxr2JEgLEjJrfQiQKKFmU2WSm6hehSjwFkGohrStYGCuy61ebPAev50V9np5Y+RpjT8Y9gYcRysivvyGEhy0zKC5ExSb6XCX+2kQ2EErNkqT/Blas=
   on:
     tags: true
 notifications:
