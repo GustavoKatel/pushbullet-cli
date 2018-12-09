@@ -47,9 +47,9 @@ after_success:
 - codecov
 deploy:
   provider: pypi
-  user: GustavoKatel
+  user: gustavokatel
   password:
-    secure: FEx5o0mkpFvEhwf1qWpScx5TZMjmsD0gC+RB9N3Ec0GJWLPGEBM1CV8fU54VdSlpjSS6Uaear9K+JP5wwinVbGfEwIbjElvXVH1jGb42NyU2XtitvXJTUgpPkIBZfAaYDgHzzs02Yt7/2F/CWpUrFzNkQgyrS9CynHr26+Bz0Uk=
+    secure: cEqhImH/VvYnFjzRSfAvPoYJLLmYP0LjWT6Hws7XTTAdsXvVgPqzXOhwUBdpzCk7NQ64cLXq4r9EUpD3is8+GpVxjIkaPiuT30FFpTqzRE/EGJH/8cDkumZty/sBcfS4QH7LowjU1Jrn0TIx98qH7siH66cqCssRpp1GnrTfkZw=
   on:
     tags: true
   skip_existing: true
