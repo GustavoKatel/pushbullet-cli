@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3.6.6-alpine
 LABEL maintainer="gbritosampaio@gmail.com"
 
 ADD . /opt/pushbullet-cli
