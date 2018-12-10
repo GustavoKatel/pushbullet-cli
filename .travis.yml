@@ -6,21 +6,38 @@ branches:
   - "/^feat\\/.*$/"
 matrix:
   include:
-  - os: linux
+  - name: "Linux Python 3.5"
+    os: linux
     python: '3.5'
-  - os: linux
+
+  - name: "Linux Python 3.6"
+    os: linux
     python: '3.6'
-  - os: linux
+
+  - name: "Linux Python 3.7"
+    os: linux
     python: 3.7-dev
-  - os: osx
+
+  - name: "OSX Python 3.5"
+    os: osx
     language: generic
     env: PYTHON=3.5.6
-  - os: osx
+
+  - name: "OSX Python 3.6"
+    os: osx
     language: generic
     env: PYTHON=3.6.6
-  - os: osx
+
+  - name: "OSX Python 3.7"
+    os: osx
     language: generic
     env: PYTHON=3.7.0
+
+  - name: docker
+    os: linux
+    env: BUILD_DOCKER=true
+    services:
+      - docker
 before_install: |
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew update
@@ -38,21 +55,36 @@ before_install: |
     conda create -n py$PYTHON python=$PYTHON
     activate py$PYTHON
   fi
+
 install:
-- pip install pipenv
-- pipenv install --dev
-script:
-- pipenv run pytest --cov=pushbullet_cli
+  - pip install pipenv
+  - pipenv install --dev
+
+script: |
+  if [ "$BUILD_DOCKER" == "true" ]; then
+    docker build -t pushbullet-cli
+  else
+    pipenv run pytest --cov=pushbullet_cli
+  fi
+
 after_success:
-- codecov
+  - codecov
+
 deploy:
-  provider: pypi
-  user: gustavokatel
-  password:
-    secure: wceJMzwNsCqcUhy+dxtex9dR/fMEqSvJaPRaGcAkegikNfZEhjSngWIqmuiiNFxxvOgsWouU0uQLsZYaFV7tTmn9MP+3RTjjYjIXmaqTTqGbKGzbyFDJgc1xu3a5dyEK1OGUL3a6JWfOt1v+6x3Y+zCMox1NLoF5kEjwab1Hbkqr6PYDcCQarE9sj8OG6C6Vg8DGkzzMetfeWPsvOHA+viBaQQpsAsawtZU/XiupEid6PaJJ5WGMD5FG/qgPs/mmnwysEZBc+G5CEYeCu1E0J+i4xSE5IjQUG5xRcBIezgO06BldtmDSKMERo3pzdDJGmhYC+5QtsUGaJz2HuOJpRZ55yP0Non7s6+1GODw97aSdnC7yzEPbKo61x8q8LZN3dWGciWARCfcwQBWZRBgZqMqYdaKN3Bk96Ai6DQRdctcPjvoXzKLtU4eJawP24OcC6c/kkNqc6e2tVactSbfGe+FJtPHlyoYwIVsTP2Wcv7CPzGBqAxy4VHoCiMTNFwp9MsK854bi3/fpiML0beyUEBG2tx+9KCxGfNKhIA0hoQlIkuWl4kMOeMrM9iw5RVT1js2v+/uGDJJ8cHDfUPqCwhSsjYSkQrbm9r2C/gXsV56jZytz6XxGsesuhvuIRNdEYoPvYNb4lOixVdjE9qCuoFzio58XqWdO0M0ey3Jb+Jo=
-  on:
-    tags: true
-  skip_existing: true
+  - provider: pypi
+    user: gustavokatel
+    password:
+      secure: wceJMzwNsCqcUhy+dxtex9dR/fMEqSvJaPRaGcAkegikNfZEhjSngWIqmuiiNFxxvOgsWouU0uQLsZYaFV7tTmn9MP+3RTjjYjIXmaqTTqGbKGzbyFDJgc1xu3a5dyEK1OGUL3a6JWfOt1v+6x3Y+zCMox1NLoF5kEjwab1Hbkqr6PYDcCQarE9sj8OG6C6Vg8DGkzzMetfeWPsvOHA+viBaQQpsAsawtZU/XiupEid6PaJJ5WGMD5FG/qgPs/mmnwysEZBc+G5CEYeCu1E0J+i4xSE5IjQUG5xRcBIezgO06BldtmDSKMERo3pzdDJGmhYC+5QtsUGaJz2HuOJpRZ55yP0Non7s6+1GODw97aSdnC7yzEPbKo61x8q8LZN3dWGciWARCfcwQBWZRBgZqMqYdaKN3Bk96Ai6DQRdctcPjvoXzKLtU4eJawP24OcC6c/kkNqc6e2tVactSbfGe+FJtPHlyoYwIVsTP2Wcv7CPzGBqAxy4VHoCiMTNFwp9MsK854bi3/fpiML0beyUEBG2tx+9KCxGfNKhIA0hoQlIkuWl4kMOeMrM9iw5RVT1js2v+/uGDJJ8cHDfUPqCwhSsjYSkQrbm9r2C/gXsV56jZytz6XxGsesuhvuIRNdEYoPvYNb4lOixVdjE9qCuoFzio58XqWdO0M0ey3Jb+Jo=
+    on:
+      tags: true
+    skip_existing: true
+
+  - provider: script
+    script: bash .ci/deploy-docker.sh
+    on:
+      tags: true
+      branch: master
+
 notifications:
   email:
     on_success: never

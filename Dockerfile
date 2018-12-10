@@ -1,9 +1,10 @@
 FROM python:3-alpine
-MAINTAINER gbritosampaio@gmail.com
+LABEL maintainer="gbritosampaio@gmail.com"
 
 ADD . /opt/pushbullet-cli
 
-RUN apk add build-base libffi-dev openssl-dev && \
+RUN apk add -v build-base libffi-dev openssl-dev && \
+/opt/pushbullet-cli/.ci/test-docker.sh && \
 pip install /opt/pushbullet-cli && \
 rm -rf /opt/pushbullet-cli && \
 apk del build-base libffi-dev openssl-dev
