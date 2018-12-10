@@ -6,11 +6,11 @@ branches:
   - "/^feat\\/.*$/"
 matrix:
   include:
-  - name: docker
-    os: linux
-    env: BUILD_DOCKER=true
-    services:
-      - docker
+  # - name: docker
+  #   os: linux
+  #   env: BUILD_DOCKER=true
+  #   services:
+  #     - docker
 
   - name: "Linux Python 3.5"
     os: linux
