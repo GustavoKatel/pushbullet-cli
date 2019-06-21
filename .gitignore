@@ -11,6 +11,7 @@ coverage.xml
 tmp/
 .vscode
 
+build/
 dist/
 
 # We are targeting multiple OS and python versions
