@@ -9,6 +9,7 @@ import click
 import keyring
 import keyrings.alt
 import pushbullet
+from importlib import reload
 
 reload(sys)
 sys.setdefaultencoding('utf8')
