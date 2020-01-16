@@ -10,6 +10,9 @@ import keyring
 import keyrings.alt
 import pushbullet
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from .__version__ import __version__
 
 
