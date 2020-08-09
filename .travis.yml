@@ -11,11 +11,6 @@ matrix:
   #   env: BUILD_DOCKER=true
   #   services:
   #     - docker
-
-  - name: "Linux Python 3.5"
-    os: linux
-    python: '3.5'
-
   - name: "Linux Python 3.6"
     os: linux
     python: '3.6'
@@ -24,10 +19,9 @@ matrix:
     os: linux
     python: 3.7-dev
 
-  - name: "OSX Python 3.5"
-    os: osx
-    language: generic
-    env: PYTHON=3.5.6
+  - name: "Linux Python 3.8"
+    os: linux
+    python: '3.8'
 
   - name: "OSX Python 3.6"
     os: osx
@@ -38,6 +32,11 @@ matrix:
     os: osx
     language: generic
     env: PYTHON=3.7.0
+
+  - name: "OSX Python 3.8"
+    os: osx
+    language: generic
+    env: PYTHON=3.8.1
 
 
 before_install: |
