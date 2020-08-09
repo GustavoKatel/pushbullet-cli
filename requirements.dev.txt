@@ -1,6 +1,6 @@
 -r requirements.txt
 bumpversion
-pytest==5.4.3
+pytest
 pytest-xdist
 pytest-cov
 pytest-mock

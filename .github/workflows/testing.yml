@@ -24,4 +24,4 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.dev.txt
       - name: Test
-        run: pytest --cov=pushbullet_cli
+        run: pytest --cov=pushbullet_cli -s

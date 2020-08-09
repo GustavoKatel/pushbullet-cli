@@ -1,28 +1,10 @@
 import click
-import keyring
 import pytest
 from click.testing import CliRunner
 
 
-class TestKeyring(keyring.backend.KeyringBackend):
-    """A test keyring which always outputs same password
-    """
-    priority = 1
-    pwd = None
-
-    def set_password(self, servicename, username, password):
-        self.pwd = password
-
-    def get_password(self, servicename, username):
-        return self.pwd
-
-    def delete_password(self, servicename, username, password):
-        self.pwd = None
-
-
 @pytest.yield_fixture
 def pb_api(mocker):
-    keyring.set_keyring(TestKeyring())
     from pushbullet_cli import app
     from tests.mock_pushbullet import MockPushBullet
     mock_pb = MockPushBullet()
