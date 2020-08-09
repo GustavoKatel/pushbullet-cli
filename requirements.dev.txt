@@ -1,0 +1,14 @@
+-r requirements.txt
+bumpversion
+pytest
+pytest-xdist
+pytest-cov
+pytest-mock
+pytest-regressions
+yapf
+isort
+pathlib2
+codecov
+invoke
+pre-commit
+pylint
