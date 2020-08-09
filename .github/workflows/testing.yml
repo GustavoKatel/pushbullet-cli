@@ -1,3 +1,4 @@
+name: test
 
 on:
   schedule:
@@ -22,5 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install pipenv
         run: pip install pipenv
+      - name: Install deps
+        run: pipenv install --dev
       - name: Test
         run: pipenv run pytest --cov=pushbullet_cli
