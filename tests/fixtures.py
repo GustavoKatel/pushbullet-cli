@@ -8,8 +8,8 @@ def pb_api(mocker):
     from pushbullet_cli import app
     from tests.mock_pushbullet import MockPushBullet
     mock_pb = MockPushBullet()
-    with mocker.patch.object(app, '_get_pb', return_value=mock_pb):
-        yield mock_pb
+    mocker.patch.object(app, '_get_pb', return_value=mock_pb)
+    yield mock_pb
 
 
 @pytest.fixture

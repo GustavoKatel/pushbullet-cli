@@ -39,11 +39,10 @@ def test_push_to_channel(push, pb_api, mocker):
     from tests.mock_pushbullet import MockPushBullet
     channel = MockPushBullet()
 
-    with mocker.patch.object(
-            pushbullet.channel, 'Channel', return_value=channel):
-        result = push(['test', '-c', 'test_channel'])
-        channel.push_note.assert_called_once_with(body='test', title='')
-        pb_api.push_note.assert_not_called()
+    mocker.patch.object(pushbullet.channel, 'Channel', return_value=channel)
+    result = push(['test', '-c', 'test_channel'])
+    channel.push_note.assert_called_once_with(body='test', title='')
+    pb_api.push_note.assert_not_called()
 
 
 def test_push_link(push, pb_api):
