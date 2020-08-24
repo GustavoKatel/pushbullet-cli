@@ -1,4 +1,4 @@
 click~=7.1
 pushbullet-py~=0.11.0
-keyring~=21.3.0
+keyring~=21.3.1
 keyrings-alt~=3.1
