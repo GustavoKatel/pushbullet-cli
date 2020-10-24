@@ -15,7 +15,8 @@ class MockPushBullet(object):
 
     def upload_file(self, f, path):
         import os
-        return {'filename': os.path.basename(path)}
+
+        return {"filename": os.path.basename(path)}
 
     def new_device(self, nickname):
         device = MockPushBullet()
@@ -25,11 +26,12 @@ class MockPushBullet(object):
 
     def new_push(self, **data):
         import datetime
+
         created = datetime.datetime(2018, 10, 23, 18, 3, 2)
         try:
-            data['created'] = created.timestamp()
+            data["created"] = created.timestamp()
         except AttributeError:
-            data['created'] = created.strftime('%s.%f')
+            data["created"] = created.strftime("%s.%f")
 
         self.pushes.append(data)
         return data

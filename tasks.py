@@ -7,10 +7,11 @@ from invoke import task
 @task
 def test(ctx, nocov=False):
     import pytest
-    args = ['tests']
+
+    args = ["tests"]
 
     if not nocov:
-        args.append('--cov=pushbullet_cli')
+        args.append("--cov=pushbullet_cli")
 
     pytest.main(args)
 
@@ -23,7 +24,7 @@ def format(ctx, noimports=False, nostyle=False):
     if not nostyle:
         from yapf.yapflib.yapf_api import FormatFile
 
-    for filename in glob.glob('**/*.py', recursive=True):
+    for filename in glob.glob("**/*.py", recursive=True):
         if not noimports:
             SortImports(filename)
         if not nostyle:
@@ -32,4 +33,4 @@ def format(ctx, noimports=False, nostyle=False):
 
 @task
 def install_hooks(ctx):
-    ctx.run('pre-commit install')
+    ctx.run("pre-commit install")

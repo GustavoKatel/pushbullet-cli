@@ -19,7 +19,8 @@ class NoApiKey(click.ClickException):
     def __init__(self):
         msg = (
             "No API key was specified. Either run pb set-key to set a permanent key or pass the desired key in PUSHBULLET_KEY environment vaiable.\n"
-            "You can find your key at <https://www.pushbullet.com/account>.")
+            "You can find your key at <https://www.pushbullet.com/account>."
+        )
         super(NoApiKey, self).__init__(msg)
 
 
@@ -28,15 +29,19 @@ class InvalidDevice(click.ClickException):
 
     def __init__(self, index, devices):
         super(InvalidDevice, self).__init__(
-            "Invalid device number {0}. Choose one of the following devices:\n{1}"
-            .format(
-                index, "\n".join("{0}. {1}".format(i, device.nickname)
-                                 for i, device in enumerate(devices))))
+            "Invalid device number {0}. Choose one of the following devices:\n{1}".format(
+                index,
+                "\n".join(
+                    "{0}. {1}".format(i, device.nickname)
+                    for i, device in enumerate(devices)
+                ),
+            )
+        )
 
 
 def _get_pb():
-    if 'PUSHBULLET_KEY' in os.environ:
-        return pushbullet.PushBullet(os.environ['PUSHBULLET_KEY'])
+    if "PUSHBULLET_KEY" in os.environ:
+        return pushbullet.PushBullet(os.environ["PUSHBULLET_KEY"])
 
     password = keyring.get_password("pushbullet", "cli")
     if not password:
@@ -45,13 +50,15 @@ def _get_pb():
     return pushbullet.PushBullet(password)
 
 
-def _push(data_type,
-          title=None,
-          message=None,
-          channel=None,
-          device=None,
-          file_path=None,
-          url=None):
+def _push(
+    data_type,
+    title=None,
+    message=None,
+    channel=None,
+    device=None,
+    file_path=None,
+    url=None,
+):
     pb = _get_pb()
 
     data = {"body": message}
@@ -69,7 +76,7 @@ def _push(data_type,
         data.update(file_data)
 
     if channel is not None:
-        pb = pushbullet.channel.Channel(pb, {'tag': channel})
+        pb = pushbullet.channel.Channel(pb, {"tag": channel})
 
     if data_type == "file":
         pb.push_file(**data)
@@ -100,7 +107,7 @@ def dismiss():
 
     pushes = pb.get_pushes(filter_inactive=True)
     for current_push in pushes:
-        pb.dismiss_push(current_push['iden'])
+        pb.dismiss_push(current_push["iden"])
 
 
 @main.command("list-devices", help="List your devices.")
@@ -113,12 +120,12 @@ def list_devices():
 @main.command("set-key", help="Set your API key.")
 def set_key():
     key = getpass.getpass(
-        "Enter your security token from https://www.pushbullet.com/account: ")
+        "Enter your security token from https://www.pushbullet.com/account: "
+    )
     keyring.set_password("pushbullet", "cli", key)
 
 
-@main.command(
-    "delete-key", help="Remove your API key from the system keyring.")
+@main.command("delete-key", help="Remove your API key from the system keyring.")
 def delete_key():
     keyring.delete_password("pushbullet", "cli")
 
@@ -130,7 +137,7 @@ def delete_key():
     type=int,
     default=None,
     required=True,
-    help="Device index to send SMS from. Use pb list-devices to get the indices."
+    help="Device index to send SMS from. Use pb list-devices to get the indices.",
 )
 @click.option(
     "-n",
@@ -138,8 +145,9 @@ def delete_key():
     type=str,
     default=None,
     required=True,
-    help="The phone number to send the SMS to.")
-@click.argument('message', default=None, required=False)
+    help="The phone number to send the SMS to.",
+)
+@click.argument("message", default=None, required=False)
 def sms(device, number, message):
     pb = _get_pb()
     try:
@@ -147,37 +155,37 @@ def sms(device, number, message):
     except IndexError:
         raise InvalidDevice(device, pb.devices)
 
-    kwargs = {'device': device, 'number': number, 'message': message}
+    kwargs = {"device": device, "number": number, "message": message}
     pb.push_sms(**kwargs)
 
 
 def _format_push(p):
     s = "Created:\t{}\n".format(
-        datetime.datetime.fromtimestamp(p['created']).strftime("%x %X"))
+        datetime.datetime.fromtimestamp(p["created"]).strftime("%x %X")
+    )
 
-    s += "Sender:\t\t{}".format(p['sender_name'])
-    if 'sender_email' in p:
-        s += " ({})".format(p['sender_email'])
+    s += "Sender:\t\t{}".format(p["sender_name"])
+    if "sender_email" in p:
+        s += " ({})".format(p["sender_email"])
     s += "\n"
 
-    if p['type'] == 'file':
-        s += "Filetype:\t{}\n".format(p['file_type'])
-        s += "Filename:\t{}\n".format(p['file_name'])
-        s += "Link:\t\t{}\n".format(p['file_url'])
+    if p["type"] == "file":
+        s += "Filetype:\t{}\n".format(p["file_type"])
+        s += "Filename:\t{}\n".format(p["file_name"])
+        s += "Link:\t\t{}\n".format(p["file_url"])
     else:
-        if 'title' in p:
-            s += "Title:\t\t{}\n".format(p['title'])
-        if 'url' in p:
-            s += "Link:\t\t{}\n".format(p['url'])
-        if 'body' in p:
-            s += "\n{}\n".format(p['body'].rstrip())
+        if "title" in p:
+            s += "Title:\t\t{}\n".format(p["title"])
+        if "url" in p:
+            s += "Link:\t\t{}\n".format(p["url"])
+        if "body" in p:
+            s += "\n{}\n".format(p["body"].rstrip())
 
     return s.rstrip()
 
 
 @main.command("list", help="List your pushes.")
-@click.option(
-    "-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
+@click.option("-c", "--count", type=int, default=10, help="Number of pushes to fetch.")
 def list_pushes(count):
     pb = _get_pb()
 
@@ -191,46 +199,41 @@ def list_pushes(count):
     "--device",
     type=int,
     default=None,
-    help="Device index to push to. Use pb list-devices to get the indices.")
-@click.option(
-    "-c", "--channel", type=str, default=None, help="Push to a channel.")
+    help="Device index to push to. Use pb list-devices to get the indices.",
+)
+@click.option("-c", "--channel", type=str, default=None, help="Push to a channel.")
 @click.option("-t", "--title", type=str, default=None, help="Set a title.")
 @click.option(
     "-f",
     "--file",
     "filename",
     default=None,
-    help="The given argument is a name file to push.")
+    help="The given argument is a name file to push.",
+)
 @click.option("-u", "--link", default=None, help="The given argument URL.")
-@click.argument('arg', default=None, required=False)
+@click.argument("arg", default=None, required=False)
 def push(title, device, channel, filename, link, arg):
     if device is not None and channel is not None:
-        raise click.ClickException(
-            "--channel and --device cannot be used together")
+        raise click.ClickException("--channel and --device cannot be used together")
 
-    kwargs = {
-        'title': title,
-        'device': device,
-        'channel': channel,
-        'message': arg
-    }
+    kwargs = {"title": title, "device": device, "channel": channel, "message": arg}
 
     if filename and link:
         raise click.ClickException("--file and --link cannot be used together")
 
     elif filename:
-        kwargs['file_path'] = filename
-        kwargs['data_type'] = 'file'
+        kwargs["file_path"] = filename
+        kwargs["data_type"] = "file"
     elif link:
-        kwargs['url'] = link
-        kwargs['data_type'] = 'url'
+        kwargs["url"] = link
+        kwargs["data_type"] = "url"
     else:
         if arg is None:
             if sys.stdin.isatty():
                 print("Enter your message: ")
-            kwargs['message'] = sys.stdin.read()
+            kwargs["message"] = sys.stdin.read()
 
-        kwargs['data_type'] = 'text'
+        kwargs["data_type"] = "text"
 
     _push(**kwargs)
 

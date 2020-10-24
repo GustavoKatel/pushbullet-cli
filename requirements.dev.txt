@@ -5,7 +5,7 @@ pytest-xdist
 pytest-cov
 pytest-mock
 pytest-regressions
-yapf
+black
 isort
 pathlib2
 codecov
