@@ -1,6 +1,11 @@
+import platform
+
 import pytest
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows", reason="cannot test this on windows"
+)
 def test_set_key(set_key, pb_api, mocker):
     import keyring
     import getpass
