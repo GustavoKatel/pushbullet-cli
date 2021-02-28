@@ -1,7 +1,7 @@
 Pushbullet CLI interface
 ========================
 
-|Build Status| |Windows Build Status| |Codecov| |PyPI| |license|
+|Build Status| |Codecov| |PyPI| |license|
 
 Installation
 ------------
