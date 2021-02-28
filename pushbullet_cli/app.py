@@ -8,6 +8,7 @@ import sys
 import click
 import keyring
 import keyrings.alt
+import keyrings.alt.file
 import pushbullet
 
 from .__version__ import __version__
