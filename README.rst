@@ -84,7 +84,13 @@ To set the API key from within python:
 
 Changelog
 ---------
+* 1.2.1
+
+  - Bump dependencies
+  - Fix #99
+
 * 1.2
+
   - Bump dependencies
 
 * 1.1
@@ -121,11 +127,8 @@ Pull requests are welcome
 Take a look at the `Contributing
 guidelines <https://github.com/GustavoKatel/pushbullet-cli/blob/master/CONTRIBUTING.rst>`__
 
-.. |Build Status| image:: https://travis-ci.com/GustavoKatel/pushbullet-cli.svg?branch=master
-   :target: https://travis-ci.com/GustavoKatel/pushbullet-cli
-
-.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/cgwa2lgmglplp6jd/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/GustavoKatel/pushbullet-cli
+.. |Build Status| image:: https://github.com/GustavoKatel/pushbullet-cli/actions/workflows/testing.yml/badge.svg
+   :target: https://github.com/GustavoKatel/pushbullet-cli/actions/workflows/testing.yml
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/GustavoKatel/pushbullet-cli.svg
    :target: https://codecov.io/gh/GustavoKatel/pushbullet-cli
