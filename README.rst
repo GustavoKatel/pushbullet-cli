@@ -84,6 +84,11 @@ To set the API key from within python:
 
 Changelog
 ---------
+* 1.2.2
+
+  - Bump dependencies
+  - Add support for python 3.10
+
 * 1.2.1
 
   - Bump dependencies

@@ -2,14 +2,14 @@ pull_request_rules:
   - name: Automatic merge dependabot prs
     conditions:
       - author~=^dependabot(|-preview)\[bot\]$
-      - status-success~=^build \(ubuntu-latest.*3.6
       - status-success~=^build \(ubuntu-latest.*3.7
       - status-success~=^build \(ubuntu-latest.*3.8
       - status-success~=^build \(ubuntu-latest.*3.9
-      - status-success~=^build \(macos-latest.*3.6
+      - status-success~=^build \(ubuntu-latest.*3.10
       - status-success~=^build \(macos-latest.*3.7
       - status-success~=^build \(macos-latest.*3.8
       - status-success~=^build \(macos-latest.*3.9
+      - status-success~=^build \(macos-latest.*3.10
     actions:
       merge:
         method: merge
